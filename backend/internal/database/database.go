@@ -40,6 +40,12 @@ func New(ctx context.Context, databaseURL string) (*Database, error) {
 		slog.Warn("initial database ping failed (will retry on readiness checks)", "error", err)
 	} else {
 		slog.Info("connected to PostgreSQL successfully")
+		// Attempt to run migrations if migrations dir is available
+		for _, dir := range []string{"migrations", "../migrations", "../../migrations", "backend/migrations"} {
+			if err := RunMigrations(connectCtx, pool, dir); err == nil {
+				break
+			}
+		}
 	}
 
 	return &Database{Pool: pool}, nil
