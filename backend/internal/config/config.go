@@ -20,6 +20,7 @@ type Config struct {
 	IdleTimeout     time.Duration `json:"idle_timeout"`
 	ShutdownTimeout time.Duration `json:"shutdown_timeout"`
 	CORSAllowed     []string      `json:"cors_allowed"`
+	JWTSecret       string        `json:"-"`
 }
 
 // Load loads configuration from environment variables with sensible defaults.
@@ -30,6 +31,7 @@ func Load() *Config {
 		DatabaseURL:     getEnv("DATABASE_URL", "postgres://recess:recess_secret@localhost:5432/recess_db?sslmode=disable"),
 		RedisURL:        getEnv("REDIS_URL", "redis://localhost:6379/0"),
 		LogLevel:        getEnv("LOG_LEVEL", "info"),
+		JWTSecret:       getEnv("JWT_SECRET", "recess_jwt_super_secret_signing_key_for_development"),
 		ReadTimeout:     getEnvDuration("READ_TIMEOUT", 15*time.Second),
 		WriteTimeout:    getEnvDuration("WRITE_TIMEOUT", 15*time.Second),
 		IdleTimeout:     getEnvDuration("IDLE_TIMEOUT", 60*time.Second),

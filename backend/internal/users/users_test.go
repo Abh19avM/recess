@@ -13,7 +13,7 @@ import (
 func TestGetUserEndpoint(t *testing.T) {
 	repo := NewInMemoryRepository()
 	svc := NewService(repo)
-	handler := NewHandler(svc)
+	handler := NewHandler(svc, nil)
 
 	r := chi.NewRouter()
 	r.Mount("/api/v1/users", handler.Routes())
@@ -49,7 +49,7 @@ func TestGetUserEndpoint(t *testing.T) {
 func TestGetUserProfileEndpoint(t *testing.T) {
 	repo := NewInMemoryRepository()
 	svc := NewService(repo)
-	handler := NewHandler(svc)
+	handler := NewHandler(svc, nil)
 
 	r := chi.NewRouter()
 	r.Mount("/api/v1/users", handler.Routes())

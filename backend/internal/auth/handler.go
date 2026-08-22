@@ -26,6 +26,8 @@ func (h *Handler) Routes() chi.Router {
 
 	r.Post("/register", h.Register)
 	r.Post("/login", h.Login)
+	r.Post("/refresh", h.Refresh)
+	r.Post("/logout", h.Logout)
 	r.Post("/guest", h.Guest)
 
 	return r
@@ -49,10 +51,10 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.service.Register(r.Context(), req)
 	if err != nil {
 		if errors.Is(err, users.ErrUserAlreadyExists) {
-			httputil.ErrorJSON(w, r, http.StatusConflict, "USER_EXISTS", "username is already taken")
+			httputil.ErrorJSON(w, r, http.StatusConflict, "USER_EXISTS", "a student with this username or email already exists")
 			return
 		}
-		httputil.ErrorJSON(w, r, http.StatusInternalServerError, "INTERNAL_ERROR", "registration failed")
+		httputil.ErrorJSON(w, r, http.StatusBadRequest, "REGISTRATION_FAILED", err.Error())
 		return
 	}
 
@@ -69,14 +71,58 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	resp, err := h.service.Login(r.Context(), req)
 	if err != nil {
 		if errors.Is(err, ErrInvalidCredentials) {
-			httputil.ErrorJSON(w, r, http.StatusUnauthorized, "UNAUTHORIZED", "invalid username or password")
+			httputil.ErrorJSON(w, r, http.StatusUnauthorized, "INVALID_CREDENTIALS", "invalid username or password")
 			return
 		}
-		httputil.ErrorJSON(w, r, http.StatusInternalServerError, "INTERNAL_ERROR", "login failed")
+		httputil.ErrorJSON(w, r, http.StatusInternalServerError, "LOGIN_FAILED", "failed to process login")
 		return
 	}
 
 	httputil.JSON(w, r, http.StatusOK, resp)
+}
+
+func (h *Handler) Refresh(w http.ResponseWriter, r *http.Request) {
+	var req RefreshRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		httputil.ErrorJSON(w, r, http.StatusBadRequest, "INVALID_BODY", "failed to parse request body")
+		return
+	}
+
+	if req.RefreshToken == "" {
+		httputil.ValidationErrorJSON(w, r, "refresh_token is required", map[string]string{
+			"refresh_token": "required",
+		})
+		return
+	}
+
+	resp, err := h.service.RefreshToken(r.Context(), req.RefreshToken)
+	if err != nil {
+		if errors.Is(err, ErrInvalidRefreshToken) {
+			httputil.ErrorJSON(w, r, http.StatusUnauthorized, "INVALID_REFRESH_TOKEN", "refresh token is invalid, expired, or revoked")
+			return
+		}
+		if errors.Is(err, ErrUserNotFound) {
+			httputil.ErrorJSON(w, r, http.StatusUnauthorized, "USER_NOT_FOUND", "user account not found")
+			return
+		}
+		httputil.ErrorJSON(w, r, http.StatusInternalServerError, "REFRESH_FAILED", "failed to refresh token")
+		return
+	}
+
+	httputil.JSON(w, r, http.StatusOK, resp)
+}
+
+func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
+	var req LogoutRequest
+	_ = json.NewDecoder(r.Body).Decode(&req)
+
+	if req.RefreshToken != "" {
+		_ = h.service.Logout(r.Context(), req.RefreshToken)
+	}
+
+	httputil.JSON(w, r, http.StatusOK, map[string]string{
+		"message": "logged out successfully",
+	})
 }
 
 func (h *Handler) Guest(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +131,7 @@ func (h *Handler) Guest(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.service.CreateGuest(r.Context(), req)
 	if err != nil {
-		httputil.ErrorJSON(w, r, http.StatusInternalServerError, "INTERNAL_ERROR", "failed to create guest session")
+		httputil.ErrorJSON(w, r, http.StatusInternalServerError, "GUEST_FAILED", "failed to create guest session")
 		return
 	}
 

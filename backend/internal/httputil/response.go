@@ -1,11 +1,19 @@
 package httputil
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
+)
 
-	"github.com/Abh19avM/recess/internal/middleware"
+type contextKey string
+
+const (
+	// RequestIDHeader is the HTTP header for propagating the unique request ID.
+	RequestIDHeader = "X-Request-ID"
+	// RequestIDKey is the context key for the unique request ID.
+	RequestIDKey contextKey = "request_id"
 )
 
 // ResponseEnvelope represents the standard API response structure.
@@ -33,7 +41,10 @@ type Error struct {
 
 // JSON sends a successful JSON response with metadata.
 func JSON(w http.ResponseWriter, r *http.Request, status int, data any) {
-	reqID := middleware.GetRequestID(r.Context())
+	reqID := GetRequestID(r.Context())
+	if reqID == "" {
+		reqID = r.Header.Get(RequestIDHeader)
+	}
 	resp := ResponseEnvelope{
 		Success: true,
 		Data:    data,
@@ -50,7 +61,10 @@ func JSON(w http.ResponseWriter, r *http.Request, status int, data any) {
 
 // ErrorJSON sends a standardized JSON error response.
 func ErrorJSON(w http.ResponseWriter, r *http.Request, status int, code, message string) {
-	reqID := middleware.GetRequestID(r.Context())
+	reqID := GetRequestID(r.Context())
+	if reqID == "" {
+		reqID = r.Header.Get(RequestIDHeader)
+	}
 	resp := ResponseEnvelope{
 		Success: false,
 		Error: &Error{
@@ -68,7 +82,10 @@ func ErrorJSON(w http.ResponseWriter, r *http.Request, status int, code, message
 
 // ValidationErrorJSON sends a 422 Unprocessable Entity error response with field details.
 func ValidationErrorJSON(w http.ResponseWriter, r *http.Request, message string, details any) {
-	reqID := middleware.GetRequestID(r.Context())
+	reqID := GetRequestID(r.Context())
+	if reqID == "" {
+		reqID = r.Header.Get(RequestIDHeader)
+	}
 	resp := ResponseEnvelope{
 		Success: false,
 		Error: &Error{
@@ -83,4 +100,12 @@ func ValidationErrorJSON(w http.ResponseWriter, r *http.Request, message string,
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusUnprocessableEntity)
 	_ = json.NewEncoder(w).Encode(resp)
+}
+
+// GetRequestID extracts the request ID from context if set.
+func GetRequestID(ctx context.Context) string {
+	if id, ok := ctx.Value(RequestIDKey).(string); ok {
+		return id
+	}
+	return ""
 }

@@ -80,20 +80,37 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	userRepo := users.NewInMemoryRepository()
 	roomRepo := rooms.NewInMemoryRepository()
 
-	// 5. Initialize Services
+	// 5. Initialize Auth Token Management & Session Store
+	jwtManager := auth.NewJWTManager(cfg.JWTSecret)
+	var tokenStore auth.TokenStore
+	if rdb != nil && rdb.RDB != nil {
+		pingCtx, cancel := context.WithTimeout(ctx, 1*time.Second)
+		if _, err := rdb.Ping(pingCtx); err == nil {
+			tokenStore = auth.NewRedisTokenStore(rdb.RDB)
+		}
+		cancel()
+	}
+	if tokenStore == nil {
+		tokenStore = auth.NewInMemoryTokenStore()
+	}
+
+	authBarrier := middleware.RequireAuth(jwtManager)
+	authRateLimiter := middleware.NewIPRateLimiter(30, 1*time.Minute)
+
+	// 6. Initialize Services
 	userService := users.NewService(userRepo)
-	authService := auth.NewService(userRepo)
+	authService := auth.NewService(userRepo, jwtManager, tokenStore)
 	roomService := rooms.NewService(roomRepo)
 	gameService := games.NewService()
 
-	// 6. Initialize Handlers
-	userHandler := users.NewHandler(userService)
+	// 7. Initialize Handlers
+	userHandler := users.NewHandler(userService, authBarrier)
 	authHandler := auth.NewHandler(authService)
 	roomHandler := rooms.NewHandler(roomService)
 	gameHandler := games.NewHandler(gameService)
 	wsHandler := websocket.NewHandler(wsHub)
 
-	// 7. Configure Router
+	// 8. Configure Router
 	r := chi.NewRouter()
 
 	// Global Middlewares
@@ -130,7 +147,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	// API v1 Subrouter
 	r.Route("/api/v1", func(api chi.Router) {
-		api.Mount("/auth", authHandler.Routes())
+		api.With(authRateLimiter.Handler()).Mount("/auth", authHandler.Routes())
 		api.Mount("/users", userHandler.Routes())
 		api.Mount("/rooms", roomHandler.Routes())
 		api.Mount("/games", gameHandler.Routes())

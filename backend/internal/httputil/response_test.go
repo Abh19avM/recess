@@ -6,13 +6,11 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/Abh19avM/recess/internal/middleware"
 )
 
 func TestJSONResponse(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/test", nil)
-	ctx := context.WithValue(req.Context(), middleware.RequestIDKey, "test-req-id")
+	ctx := context.WithValue(req.Context(), RequestIDKey, "test-req-id")
 	req = req.WithContext(ctx)
 
 	rec := httptest.NewRecorder()
