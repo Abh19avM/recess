@@ -3,6 +3,7 @@ package websocket
 import (
 	"log/slog"
 	"net/http"
+	"sync"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -23,32 +24,92 @@ var upgrader = websocket.Upgrader{
 	},
 }
 
-// Client is a middleman between the websocket connection and the hub.
+// Client represents a single active WebSocket connection.
 type Client struct {
-	hub      *Hub
-	conn     *websocket.Conn
-	send     chan *RoomMessage
-	ID       string
-	UserID   string
-	RoomCode string
+	hub          *Hub
+	conn         *websocket.Conn
+	send         chan *EventEnvelope
+	mu           sync.RWMutex
+	ID           string
+	UserID       string
+	Username     string
+	IsGuest      bool
+	AvatarPreset string
+	RoomID       string
+	IsReady      bool
 }
 
-// NewClient constructs a new WebSocket client wrapper.
-func NewClient(hub *Hub, conn *websocket.Conn, clientID, userID, roomCode string) *Client {
+// NewClient initializes a new Client wrapper.
+func NewClient(hub *Hub, conn *websocket.Conn, clientID, userID, username string, isGuest bool, avatarPreset string) *Client {
 	return &Client{
-		hub:      hub,
-		conn:     conn,
-		send:     make(chan *RoomMessage, 256),
-		ID:       clientID,
-		UserID:   userID,
-		RoomCode: roomCode,
+		hub:          hub,
+		conn:         conn,
+		send:         make(chan *EventEnvelope, 256),
+		ID:           clientID,
+		UserID:       userID,
+		Username:     username,
+		IsGuest:      isGuest,
+		AvatarPreset: avatarPreset,
+		IsReady:      false,
 	}
 }
 
-// ReadPump pumps messages from the websocket connection to the hub.
+// PlayerInfo returns a snapshot of the client's public state in a room.
+func (c *Client) PlayerInfo() PlayerInfo {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return PlayerInfo{
+		UserID:       c.UserID,
+		Username:     c.Username,
+		IsGuest:      c.IsGuest,
+		AvatarPreset: c.AvatarPreset,
+		IsReady:      c.IsReady,
+	}
+}
+
+// SetRoomID updates the client's current room ID.
+func (c *Client) SetRoomID(roomID string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.RoomID = roomID
+}
+
+// GetRoomID returns the current room ID for the client.
+func (c *Client) GetRoomID() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.RoomID
+}
+
+// SetReady updates the client's ready status.
+func (c *Client) SetReady(isReady bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.IsReady = isReady
+}
+
+// GetReady returns the current ready status.
+func (c *Client) GetReady() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.IsReady
+}
+
+// Send attempts to enqueue an envelope to the client's outbound channel.
+func (c *Client) Send(env *EventEnvelope) bool {
+	select {
+	case c.send <- env:
+		return true
+	default:
+		slog.Warn("client send buffer full, dropping message", "client_id", c.ID, "user_id", c.UserID)
+		return false
+	}
+}
+
+// ReadPump listens for incoming WebSocket frames and dispatches them to the Hub.
 func (c *Client) ReadPump() {
 	defer func() {
-		c.hub.unregister <- c
+		c.hub.Unregister(c)
 		_ = c.conn.Close()
 	}()
 
@@ -60,21 +121,20 @@ func (c *Client) ReadPump() {
 	})
 
 	for {
-		var msg RoomMessage
-		err := c.conn.ReadJSON(&msg)
+		var env EventEnvelope
+		err := c.conn.ReadJSON(&env)
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				slog.Warn("websocket read error", "error", err, "client_id", c.ID)
+				slog.Debug("websocket connection closed unexpectedly", "client_id", c.ID, "user_id", c.UserID, "error", err)
 			}
 			break
 		}
-		msg.SenderID = c.UserID
-		msg.RoomCode = c.RoomCode
-		c.hub.broadcast <- &msg
+
+		c.hub.HandleMessage(c, &env)
 	}
 }
 
-// WritePump pumps messages from the hub to the websocket connection.
+// WritePump handles flushing messages to the client and sending periodic pings.
 func (c *Client) WritePump() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
@@ -84,15 +144,15 @@ func (c *Client) WritePump() {
 
 	for {
 		select {
-		case message, ok := <-c.send:
+		case env, ok := <-c.send:
 			_ = c.conn.SetWriteDeadline(time.Now().Add(writeWait))
 			if !ok {
 				_ = c.conn.WriteMessage(websocket.CloseMessage, []byte{})
 				return
 			}
 
-			if err := c.conn.WriteJSON(message); err != nil {
-				slog.Warn("websocket write error", "error", err, "client_id", c.ID)
+			if err := c.conn.WriteJSON(env); err != nil {
+				slog.Debug("failed to write JSON to websocket", "client_id", c.ID, "error", err)
 				return
 			}
 

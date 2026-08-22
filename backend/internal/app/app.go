@@ -74,7 +74,6 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 
 	// 3. Initialize WebSocket Hub
 	wsHub := websocket.NewHub()
-	go wsHub.Run()
 
 	// 4. Initialize Repositories (with in-memory fallback for local dev / tests)
 	userRepo := users.NewInMemoryRepository()
@@ -108,7 +107,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	authHandler := auth.NewHandler(authService)
 	roomHandler := rooms.NewHandler(roomService)
 	gameHandler := games.NewHandler(gameService)
-	wsHandler := websocket.NewHandler(wsHub)
+	wsHandler := websocket.NewHandler(wsHub, jwtManager)
 
 	// 8. Configure Router
 	r := chi.NewRouter()

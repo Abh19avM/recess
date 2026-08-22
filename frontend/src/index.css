@@ -1,111 +1,144 @@
-:root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+@import "tailwindcss";
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+@theme {
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-hand: 'Patrick Hand', 'Caveat', cursive;
+  --font-mono: 'JetBrains Mono', monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
-  color: var(--text);
-  background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-paper-base: #FBF9F3;
+  --color-paper-card: #FFFFFF;
+  --color-paper-muted: #F2EDE0;
+  --color-paper-yellow: #FEF9C3;
+  --color-paper-blue: #E0F2FE;
+  
+  --color-ink-black: #1E242B;
+  --color-ink-blue: #1A365D;
+  --color-ink-red: #991B1B;
+  --color-pencil-lead: #475569;
+  --color-pencil-light: #94A3B8;
 
-  @media (max-width: 1024px) {
-    font-size: 16px;
+  --color-desk-wood: #4A3525;
+  --color-cork: #D8B17A;
+  --color-chalkboard: #18231C;
+
+  --color-stamp-red: #B91C1C;
+  --color-stamp-green: #15803D;
+  --color-stamp-blue: #1D4ED8;
+  --color-stamp-amber: #B45309;
+}
+
+@layer base {
+  body {
+    background-color: #FBF9F3;
+    color: #1E242B;
+    font-family: 'Plus Jakarta Sans', sans-serif;
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
+/* Notebook & Stationery Material Utilities */
 
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
+.paper-ruled {
+  background-color: #FFFFFF;
+  background-image: 
+    linear-gradient(90deg, transparent 46px, #FCA5A5 46px, #FCA5A5 48px, transparent 48px),
+    repeating-linear-gradient(transparent, transparent 27px, #E2E8F0 27px, #E2E8F0 28px);
+  background-size: 100% 100%, 100% 28px;
+  background-attachment: local;
 }
 
-#root {
-  width: 1126px;
-  max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
+.paper-graph {
+  background-color: #FFFFFF;
+  background-image: 
+    linear-gradient(#E2E8F0 1px, transparent 1px),
+    linear-gradient(90deg, #E2E8F0 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
-body {
-  margin: 0;
+.paper-graph-dark {
+  background-color: #18231C;
+  background-image: 
+    linear-gradient(rgba(248, 250, 252, 0.08) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(248, 250, 252, 0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+.paper-cork {
+  background-color: #D8B17A;
+  background-image: radial-gradient(#C69E66 10%, transparent 11%), radial-gradient(#C69E66 10%, transparent 11%);
+  background-size: 16px 16px;
+  background-position: 0 0, 8px 8px;
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
-
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
+.rubber-stamp {
+  font-family: 'Patrick Hand', cursive;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  border-width: 2.5px;
+  border-style: solid;
   border-radius: 4px;
-  color: var(--text-h);
+  box-shadow: 0 0 0 1px inset;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+.rubber-stamp-red {
+  color: #B91C1C;
+  border-color: #B91C1C;
+  background-color: rgba(185, 28, 28, 0.06);
+  transform: rotate(-2deg);
+}
+
+.rubber-stamp-green {
+  color: #15803D;
+  border-color: #15803D;
+  background-color: rgba(21, 128, 61, 0.06);
+  transform: rotate(2deg);
+}
+
+.rubber-stamp-blue {
+  color: #1D4ED8;
+  border-color: #1D4ED8;
+  background-color: rgba(29, 78, 216, 0.06);
+  transform: rotate(-1.5deg);
+}
+
+.rubber-stamp-amber {
+  color: #B45309;
+  border-color: #B45309;
+  background-color: rgba(180, 83, 9, 0.06);
+  transform: rotate(1deg);
+}
+
+.sketch-border {
+  border: 1.5px solid #475569;
+  box-shadow: 2px 2px 0px 0px #1E242B;
+}
+
+.sketch-border-subtle {
+  border: 1px solid #CBD5E1;
+  box-shadow: 2px 2px 0px 0px rgba(71, 85, 105, 0.2);
+}
+
+.sketch-border-hover:hover {
+  box-shadow: 4px 4px 0px 0px #1E242B;
+  transform: translate(-1px, -1px);
+}
+
+.chalk-glow {
+  text-shadow: 0 0 3px rgba(248, 250, 252, 0.5), 0 0 8px rgba(248, 250, 252, 0.2);
+}
+
+.push-pin-red {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #EF4444, #991B1B);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.masking-tape {
+  background: rgba(254, 240, 138, 0.5);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(1px);
 }
