@@ -1,166 +1,248 @@
-# Recess 🏫🎮
+# Recess
 
-> A production-quality real-time multiplayer gaming platform inspired by classic school-time games.
-
----
-
-## 🎮 The Games
-
-1. **Hand Cricket** — Odd/Even toss, batting, bowling, synchronized finger choice reveals, target chasing.
-2. **Dots & Boxes** — Graph paper grid, line draws, 1x1 box claiming, and bonus turns.
-3. **XO / Tic-Tac-Toe** — 3x3 Classic and 4x4/5x5 Extended with countdown timers and line-strike animations.
-4. **Connect 4** — 7x6 wooden desk grid, gravity drops, and 4-in-a-row detection.
-5. **Paper Football** — Desk flick physics, table-edge overhang touchdowns (6 pts), and field goal kicks.
-6. **Name–Place–Animal–Thing (NPAT)** — Letter generator, synchronized timer, STOP button, and dictionary/peer validation.
+A production-grade, real-time multiplayer gaming platform inspired by classic school-time paper and desk games. Built with a server-authoritative Go backend, PostgreSQL, Redis, real-time WebSockets, and a React + TypeScript frontend adhering to a nostalgic classroom stationery design system.
 
 ---
 
-## 🏗️ Architecture & Technology Stack
+## Overview
 
-- **Backend**: Go (Chi router, Gorilla WebSockets, `pgxpool`, `go-redis`, `log/slog` structured logging, Prometheus metrics).
-- **Persistence**: PostgreSQL 16 (`pgx`/`sqlc`) + Redis 7 (Pub/Sub & session locks).
-- **Frontend**: React, TypeScript, Vite, Tailwind CSS, Zustand, TanStack Query, Framer Motion.
-- **Infrastructure**: Docker, Docker Compose, AWS ECS/Fargate, ALB, CloudFront, RDS, ElastiCache.
+Recess brings classic schoolroom games online with low-latency multiplayer mechanics, deterministic server-side rule validation, rated Elo matchmaking, and room-based desk lobbies. The platform is designed from the ground up to prevent client-side tampering, handle abrupt network drops gracefully with session state recovery, and scale horizontally across nodes.
+
+### Supported Games
+1. **Hand Cricket** — Turn-based simultaneous reveals (1–6 fingers), odd/even toss, batting/bowling turns, sudden-death wicket detection, and target chasing.
+2. **Dots & Boxes** — Graph paper grid coordinate claims, 1x1 box completion detection, continuous bonus turns, and territory tracking.
+3. **XO / Tic-Tac-Toe** — 3x3 Classic and extended tactical grids with strict turn countdown timers, win vector analysis, and streak tracking.
+4. **Connect 4** — 7x6 wooden desk grid with column gravity drops and four-in-a-row detection across horizontals, verticals, and diagonals.
+5. **Paper Football** — Tabletop drag-and-flick physics with boundary overhang touchdown detection (6 pts) and field goal kick phases.
+6. **Name–Place–Animal–Thing (NPAT)** — Multiplayer alphabet buzzer, synchronized round clocks, automated dictionary validation, and duplicate scoring logic.
 
 ---
 
-## 🚀 Quick Start: Local Development Infrastructure (Phase 1)
+## Architecture & Design Principles
 
-### Prerequisites
-- [Docker](https://docs.docker.com/get-docker/) & Docker Compose
-- [Go](https://golang.org/dl/) (version 1.22+)
-- `curl` and `jq` (optional, for inspecting JSON responses)
-
-### 1. Configuration Setup
-Copy `.env.example` to `.env`:
-
-```bash
-cp .env.example .env
+```
+                  +-----------------------------------+
+                  |         Client Browsers           |
+                  +-----------------+-----------------+
+                                    |
+                         HTTPS / WSS (JSON Envelope)
+                                    |
+                                    v
+                  +-----------------------------------+
+                  |         Go HTTP / WSS API         |
+                  |     (Chi Router, Gorilla WS)      |
+                  +--------+-----------------+--------+
+                           |                 |
+                +----------v-------+ +-------v----------+
+                |   Game Engine    | |  WebSocket Hub   |
+                | (Deterministic)  | |  (Room Presence) |
+                +------------------+ +-------+----------+
+                           |                 |
+                +----------v-------+ +-------v----------+
+                | PostgreSQL (pgx) | | Redis (Pub/Sub)  |
+                +------------------+ +------------------+
 ```
 
-Default local environment variables:
-```dotenv
-PORT=8080
-ENVIRONMENT=development
-LOG_LEVEL=info
-POSTGRES_USER=recess
-POSTGRES_PASSWORD=recess_secret
-POSTGRES_DB=recess_db
-DATABASE_URL=postgres://recess:recess_secret@postgres:5432/recess_db?sslmode=disable
-REDIS_URL=redis://redis:6379/0
-```
+### Core Tenets
+- **Server-Authoritative State**: Clients submit moves and intentions; the Go backend validates legality, executes state transitions, and broadcasts deterministic state updates.
+- **Transport Separation**: The game rule engines implement an isolated `Engine` interface with zero dependencies on HTTP or WebSocket transport layers.
+- **Deterministic State Evolution**: Replaying an ordered series of moves produces identical board states and sequential version numbers across all nodes.
+- **Resilient WebSocket Protocol**: Standard JSON event envelopes, protocol and application heartbeats, connection lifecycle tracking, and graceful disconnect detection.
+- **Production Security**: Argon2id password hashing, short-lived JWT access tokens, cryptographically secure refresh tokens, and rate-limited auth endpoints.
 
-### 2. Start Services with Docker Compose
-Run the entire backend ecosystem with a single command:
+---
 
-```bash
-docker compose up -d --build
-```
+## Technology Stack
 
-Check the health and status of all containers:
-```bash
-docker compose ps
-```
+### Backend
+- **Language**: Go 1.24+
+- **HTTP Routing**: Chi Router (`github.com/go-chi/chi/v5`)
+- **WebSockets**: Gorilla WebSocket (`github.com/gorilla/websocket`)
+- **Database & Persistence**: PostgreSQL 16 via `pgxpool` (`github.com/jackc/pgx/v5`) and `sqlc`
+- **Cache & Pub/Sub**: Redis 7 via `go-redis` (`github.com/redis/go-redis/v9`)
+- **Authentication**: Argon2id password hashing + HMAC-SHA256 JWT tokens
+- **Logging & Metrics**: `log/slog` structured JSON logging, Prometheus instrumentation
 
-You should see 3 healthy containers:
-- `recess-postgres` (PostgreSQL 16 on port `5432`)
-- `recess-redis` (Redis 7 on port `6379`)
-- `recess-backend` (Go API on port `8080`)
+### Frontend
+- **Framework**: React 19, TypeScript, Vite
+- **Styling**: Vanilla Tailwind CSS v4 with custom paper, ruled notebook, and rubber stamp utilities
+- **State Management**: Zustand (persisted auth store, toast notifications)
+- **Data Fetching**: TanStack React Query v5
+- **Routing**: React Router v7
+- **Icons**: Lucide React
+- **Testing**: Vitest, React Testing Library, JSDOM
 
-### 3. Verify Health & Readiness Endpoints
+---
 
-#### Liveness Probe (`GET /health`)
-Verifies that the application process is running:
-```bash
-curl http://localhost:8080/health
-```
-Response:
-```json
-{
-  "status": "ok",
-  "environment": "development",
-  "uptime_seconds": 12.4,
-  "timestamp": "2026-08-22T06:50:00Z"
+## Generic Game Engine Specification
+
+All games conform to the `engine.Engine` interface defined in `backend/internal/games/engine`:
+
+```go
+type Engine interface {
+    Initialize(gameID string, players []Player, config json.RawMessage) (*GameState, error)
+    ValidateMove(move Move) error
+    ApplyMove(move Move) (*GameState, error)
+    State() *GameState
+    IsFinished() bool
+    Result() *GameResult
+    NextTurn() string
+    GameType() GameType
 }
 ```
 
-#### Readiness Probe (`GET /ready`)
-Verifies active connectivity and response latencies for PostgreSQL and Redis:
-```bash
-curl http://localhost:8080/ready
-```
-Response (HTTP `200 OK` when all dependencies are healthy):
+Engines register dynamically with a thread-safe `Registry` using unique identifiers (`xo`, `hand_cricket`, `dots_boxes`, `connect4`, `paper_football`, `npat`), enabling room managers to instantiate any supported game engine at runtime.
+
+---
+
+## Real-Time WebSocket Protocol
+
+WebSocket communications utilize structured JSON event envelopes:
+
 ```json
 {
-  "status": "ready",
-  "environment": "development",
-  "uptime_seconds": 12.4,
-  "timestamp": "2026-08-22T06:50:00Z",
-  "checks": {
-    "database": {
-      "status": "up",
-      "latency_ms": 1.15
-    },
-    "redis": {
-      "status": "up",
-      "latency_ms": 0.82
-    }
-  }
+  "type": "room.join",
+  "room_id": "RECESS-BENCH-1",
+  "sequence": 1,
+  "timestamp": 1771665420000,
+  "payload": {}
 }
 ```
 
-If any service is unreachable or degraded, `/ready` responds with HTTP `503 Service Unavailable` with details in the JSON body.
+### Core Lifecycle Events
+| Event Type | Direction | Description |
+| :--- | :--- | :--- |
+| `room.join` | Client -> Server | Request to join a desk room |
+| `room.leave` | Client -> Server | Request to depart a desk room |
+| `room.state` | Server -> Client | Initial room snapshot with active member roster |
+| `player.joined` | Server -> Clients | Broadcast when a new student joins the room |
+| `player.left` | Server -> Clients | Broadcast when a student leaves the room |
+| `player.ready` | Bidirectional | Toggle and broadcast player ready status |
+| `player.disconnected` | Server -> Clients | Broadcast upon unexpected connection termination |
+| `room.message` | Bidirectional | Arbitrary broadcast messages / classroom notes |
+| `room.error` | Server -> Client | Structured error frame on validation failures |
 
 ---
 
-## 🛠️ Developer Commands (`Makefile`)
-
-| Command | Description |
-| :--- | :--- |
-| `make run-backend` | Run Go backend locally on the host machine |
-| `make test-backend` | Run all Go unit and integration tests |
-| `make fmt` | Format Go source code with `gofmt` |
-| `make lint` | Run `go vet ./...` static analysis |
-| `make docker-up` | Build and start all containers in background |
-| `make docker-down` | Stop and remove all containers |
-| `make docker-logs` | Stream logs from all Docker containers |
-| `make docker-ps` | List running Docker containers and health statuses |
-| `make health` | Query `GET /health` |
-| `make ready` | Query `GET /ready` |
-
----
-
-## 📂 Project Structure
+## Project Structure
 
 ```
 Recess/
 ├── backend/
-│   ├── cmd/
-│   │   └── server/
-│   │       ├── main.go             # Chi HTTP router, health endpoints, graceful shutdown
-│   │       └── main_test.go        # Liveness & readiness test suite
+│   ├── cmd/server/             # Application entrypoint and bootstrapping
 │   ├── internal/
-│   │   ├── config/                 # Environment & runtime configuration
-│   │   ├── database/               # PostgreSQL pgxpool connection & health check
-│   │   ├── redis/                  # Redis client connection & health check
-│   │   ├── middleware/             # Structured logging & X-Request-ID propagation
-│   │   ├── games/                  # Independent game engines (Phase 3)
-│   │   ├── websocket/              # Real-time WebSocket hub (Phase 4)
-│   │   ├── matchmaking/            # Matchmaking queues (Phase 4)
-│   │   ├── rooms/                  # Custom room management (Phase 4)
-│   │   ├── auth/                   # JWT & guest auth (Phase 5)
-│   │   ├── users/                  # User accounts & Elo (Phase 5)
-│   │   └── leaderboard/            # Honor roll rankings (Phase 5)
-│   ├── Dockerfile                  # Multi-stage production container
+│   │   ├── app/                # Server lifecycle, dependency injection, and router wiring
+│   │   ├── auth/               # Argon2id password hashing, JWT tokens, session store
+│   │   ├── config/             # Environment variables and runtime configuration
+│   │   ├── database/           # PostgreSQL connection pool and sqlc models
+│   │   ├── games/              # Game engines, registry, and metadata service
+│   │   │   ├── engine/         # Generic Engine interface, types, and Registry
+│   │   │   └── xo/             # Reference XO / Tic-Tac-Toe engine implementation
+│   │   ├── httputil/           # Standard JSON response envelopes and error handlers
+│   │   ├── middleware/         # Structured logger, recoverer, auth barrier, rate limiter
+│   │   ├── redis/              # Redis client connection and health checks
+│   │   ├── rooms/              # Room entity repositories and lifecycle management
+│   │   ├── users/              # User domain models, repositories, and handlers
+│   │   └── websocket/          # WebSocket connection manager, client pumps, and hub
+│   ├── migrations/             # SQL schema migrations (PostgreSQL)
 │   ├── go.mod
 │   └── go.sum
-├── frontend/                       # React + TypeScript + Tailwind frontend
+├── frontend/
+│   ├── src/
+│   │   ├── components/         # Reusable design system components (Button, Input, PaperCard, etc.)
+│   │   ├── hooks/              # Custom hooks including typed useWebSocket
+│   │   ├── lib/                # API client, utility functions
+│   │   ├── pages/              # Primary routes (Landing, Login, Register, Dashboard, Games, Profile, WebSocket test)
+│   │   ├── routes/             # ProtectedRoute barrier
+│   │   └── store/              # Zustand auth and toast state stores
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.ts
 ├── docs/
-│   └── DESIGN.md                   # Complete UI/UX design system & board specs
-├── infra/
-│   └── docker/                     # Infrastructure Dockerfiles
-├── .env.example
-├── docker-compose.yml              # PostgreSQL 16 + Redis 7 + Go backend
-├── Makefile                        # Convenient development targets
+│   ├── API.md                  # Comprehensive REST and WebSocket API documentation
+│   ├── DATABASE.md             # Schema documentation, tables, and relationships
+│   ├── DESIGN.md               # UI/UX design specifications and color tokens
+│   └── decisions/              # Architecture Decision Records (ADRs)
+├── docker-compose.yml          # Local container orchestration (PostgreSQL 16, Redis 7, Backend)
+├── Makefile                    # Standardized development and testing targets
 └── README.md
 ```
+
+---
+
+## Quick Start & Local Setup
+
+### Prerequisites
+- [Go](https://golang.org/dl/) (1.24+)
+- [Node.js](https://nodejs.org/) (20+) & `npm`
+- [Docker](https://docs.docker.com/get-docker/) and Docker Compose
+
+### 1. Clone & Configure Environment
+```bash
+git clone https://github.com/Abh19avM/recess.git
+cd recess
+cp .env.example .env
+```
+
+### 2. Start Infrastructure Dependencies
+```bash
+docker compose up -d
+```
+
+Verify that containers are healthy:
+```bash
+docker compose ps
+```
+
+### 3. Run Backend Service
+```bash
+cd backend
+go run ./cmd/server
+```
+The API server will listen on `http://localhost:8080`.
+
+### 4. Run Frontend Development Server
+```bash
+cd frontend
+npm install
+npm run dev
+```
+The Vite development server will open at `http://localhost:5173`.
+
+---
+
+## Testing & Verification
+
+### Run Backend Unit and Integration Tests
+```bash
+cd backend
+go test -v ./...
+```
+
+### Run Frontend Unit Tests
+```bash
+cd frontend
+npm run test
+```
+
+### Run Frontend Production Build Validation
+```bash
+cd frontend
+npm run build
+```
+
+---
+
+## Makefile Targets
+
+| Target | Description |
+| :--- | :--- |
+| `make run-backend` | Start the Go backend application locally |
+| `make test-backend` | Run all Go test packages with coverage reporting |
+| `make fmt` | Format all Go code using `gofmt` |
+| `make lint` | Run static analysis with `go vet ./...` |
+| `make docker-up` | Spin up PostgreSQL, Redis, and backend containers |
+| `make docker-down` | Tear down Docker Compose containers |
+| `make docker-logs` | Stream unified container logs |
+| `make health` | Query liveness probe `GET /health` |
+| `make ready` | Query readiness probe `GET /ready` |
