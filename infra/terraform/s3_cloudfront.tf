@@ -57,7 +57,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   is_ipv6_enabled     = true
   default_root_object = "index.html"
-  price_class         = "PriceClass_100" # NA & Europe edge locations for minimal cost
+  price_class         = "PriceClass_200" # Includes India (Mumbai, Delhi, Chennai, Bangalore) & Global Edge POPs
 
   origin {
     domain_name              = aws_s3_bucket.frontend.bucket_regional_domain_name
