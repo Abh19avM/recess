@@ -86,6 +86,9 @@ func (h *Handler) ServeWS(w http.ResponseWriter, r *http.Request) {
 
 	clientID := "conn_" + randomID(6)
 	client := NewClient(h.hub, conn, clientID, userID, username, isGuest, avatarPreset)
+	if r.URL.Query().Get("role") == "spectator" || r.URL.Query().Get("spectator") == "true" {
+		client.SetSpectator(true)
+	}
 	h.hub.Register(client)
 
 	// 4. Auto-join initial room if requested in URL query parameter

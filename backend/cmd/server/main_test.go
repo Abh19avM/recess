@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"sync"
 	"testing"
 
 	"github.com/Abh19avM/recess/internal/app"
@@ -13,12 +14,31 @@ import (
 	"github.com/Abh19avM/recess/internal/middleware"
 )
 
-func TestAppHealthEndpoint(t *testing.T) {
-	cfg := config.Load()
-	application, err := app.New(context.Background(), cfg)
-	if err != nil {
-		t.Fatalf("failed to initialize app: %v", err)
+var (
+	sharedApp     *app.App
+	sharedAppErr  error
+	sharedAppOnce sync.Once
+)
+
+func getTestApp(t *testing.T) *app.App {
+	sharedAppOnce.Do(func() {
+		cfg := config.Load()
+		cfg.DatabaseURL = ""
+		cfg.RedisURL = ""
+		var err error
+		sharedApp, err = app.New(context.Background(), cfg)
+		if err != nil {
+			sharedAppErr = err
+		}
+	})
+	if sharedAppErr != nil {
+		t.Fatalf("failed to initialize app: %v", sharedAppErr)
 	}
+	return sharedApp
+}
+
+func TestAppHealthEndpoint(t *testing.T) {
+	application := getTestApp(t)
 
 	req := httptest.NewRequest(http.MethodGet, "/health", nil)
 	rec := httptest.NewRecorder()
@@ -44,18 +64,14 @@ func TestAppHealthEndpoint(t *testing.T) {
 }
 
 func TestAppReadyEndpoint(t *testing.T) {
-	cfg := config.Load()
-	application, err := app.New(context.Background(), cfg)
-	if err != nil {
-		t.Fatalf("failed to initialize app: %v", err)
-	}
+	application := getTestApp(t)
 
 	req := httptest.NewRequest(http.MethodGet, "/ready", nil)
 	rec := httptest.NewRecorder()
 
 	application.Router().ServeHTTP(rec, req)
 
-	// Since local Postgres/Redis aren't running in this unit test context, ready returns 503
+	// Since local Postgres/Redis aren't running in this unit test context, ready returns 503 or 200
 	if rec.Code != http.StatusServiceUnavailable && rec.Code != http.StatusOK {
 		t.Fatalf("expected status 503 or 200, got %d", rec.Code)
 	}
@@ -67,11 +83,7 @@ func TestAppReadyEndpoint(t *testing.T) {
 }
 
 func TestAPIV1RoutesMounted(t *testing.T) {
-	cfg := config.Load()
-	application, err := app.New(context.Background(), cfg)
-	if err != nil {
-		t.Fatalf("failed to initialize app: %v", err)
-	}
+	application := getTestApp(t)
 
 	endpoints := []string{
 		"/api/v1/games",
@@ -98,3 +110,22 @@ func TestAPIV1RoutesMounted(t *testing.T) {
 		}
 	}
 }
+
+func TestAppMetricsEndpoint(t *testing.T) {
+	application := getTestApp(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/metrics", nil)
+	rec := httptest.NewRecorder()
+
+	application.Router().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected /metrics to return 200 OK, got %d", rec.Code)
+	}
+
+	body := rec.Body.String()
+	if len(body) == 0 {
+		t.Errorf("expected non-empty metrics output")
+	}
+}
+

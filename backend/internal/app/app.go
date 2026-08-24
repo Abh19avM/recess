@@ -13,6 +13,9 @@ import (
 	"github.com/Abh19avM/recess/internal/config"
 	"github.com/Abh19avM/recess/internal/database"
 	"github.com/Abh19avM/recess/internal/games"
+	"github.com/Abh19avM/recess/internal/leaderboard"
+	"github.com/Abh19avM/recess/internal/matchmaking"
+	"github.com/Abh19avM/recess/internal/metrics"
 	"github.com/Abh19avM/recess/internal/middleware"
 	"github.com/Abh19avM/recess/internal/redis"
 	"github.com/Abh19avM/recess/internal/rooms"
@@ -21,6 +24,9 @@ import (
 	"github.com/go-chi/chi/v5"
 	chimiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
+	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
+	goredis "github.com/redis/go-redis/v9"
 )
 
 var startTime = time.Now()
@@ -60,6 +66,12 @@ type ReadyResponse struct {
 
 // New initializes and wires all application layers and dependencies.
 func New(ctx context.Context, cfg *config.Config) (*App, error) {
+	// Initialize OpenTelemetry Tracing Provider
+	_, _ = metrics.InitTracerProvider("recess-backend", cfg.Environment)
+
+	// Set Default Redacting Logger to protect credentials & tokens
+	cfg.SetupLogger()
+
 	// 1. Initialize PostgreSQL Connection Pool
 	db, err := database.New(ctx, cfg.DatabaseURL)
 	if err != nil {
@@ -73,7 +85,12 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	}
 
 	// 3. Initialize WebSocket Hub
-	wsHub := websocket.NewHub()
+	var wsHub *websocket.Hub
+	if rdb != nil && rdb.RDB != nil {
+		wsHub = websocket.NewHub(websocket.WithRedis(rdb.RDB))
+	} else {
+		wsHub = websocket.NewHub()
+	}
 
 	// 4. Initialize Repositories (with in-memory fallback for local dev / tests)
 	userRepo := users.NewInMemoryRepository()
@@ -102,17 +119,32 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	roomService := rooms.NewService(roomRepo)
 	gameService := games.NewService()
 
+	var rdbClient *goredis.Client
+	if rdb != nil {
+		rdbClient = rdb.RDB
+	}
+	matchmakingService := matchmaking.NewService(rdbClient)
+
+	var dbPool *pgxpool.Pool
+	if db != nil {
+		dbPool = db.Pool
+	}
+	leaderboardService := leaderboard.NewService(dbPool, rdbClient)
+
 	// 7. Initialize Handlers
 	userHandler := users.NewHandler(userService, authBarrier)
 	authHandler := auth.NewHandler(authService)
 	roomHandler := rooms.NewHandler(roomService)
 	gameHandler := games.NewHandler(gameService)
+	matchmakingHandler := matchmaking.NewHandler(matchmakingService, authBarrier)
+	leaderboardHandler := leaderboard.NewHandler(leaderboardService)
 	wsHandler := websocket.NewHandler(wsHub, jwtManager)
 
 	// 8. Configure Router
 	r := chi.NewRouter()
 
 	// Global Middlewares
+	r.Use(metrics.HTTPMetricsMiddleware)
 	r.Use(middleware.RequestLogger())
 	r.Use(chimiddleware.RealIP)
 	r.Use(chimiddleware.Recoverer)
@@ -137,6 +169,7 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 	// Root Level Routes
 	r.Get("/health", app.handleHealth)
 	r.Get("/ready", app.handleReady)
+	r.Handle("/metrics", promhttp.HandlerFor(metrics.Registry(), promhttp.HandlerOpts{}))
 	r.Get("/ws", wsHandler.ServeWS)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
@@ -150,6 +183,9 @@ func New(ctx context.Context, cfg *config.Config) (*App, error) {
 		api.Mount("/users", userHandler.Routes())
 		api.Mount("/rooms", roomHandler.Routes())
 		api.Mount("/games", gameHandler.Routes())
+		api.Mount("/matchmaking", matchmakingHandler.Routes())
+		api.Mount("/leaderboards", leaderboardHandler.Routes())
+		api.Mount("/progression", leaderboardHandler.UserRoutes())
 	})
 
 	app.httpServer = &http.Server{
@@ -222,7 +258,7 @@ func (a *App) handleHealth(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) handleReady(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), 1*time.Second)
 	defer cancel()
 
 	checks := make(map[string]ServiceCheck)

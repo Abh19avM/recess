@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { toast } from '../store/toastStore'
 
-export type ConnectionStatus = 'CONNECTING' | 'OPEN' | 'CLOSING' | 'CLOSED'
+export type ConnectionStatus = 'CONNECTING' | 'OPEN' | 'RECONNECTING' | 'CLOSING' | 'CLOSED'
 
 export interface PlayerInfo {
   user_id: string
@@ -23,23 +23,34 @@ export interface EventEnvelope<T = any> {
 export interface UseWebSocketOptions {
   autoConnect?: boolean
   initialRoom?: string
+  role?: 'player' | 'spectator'
 }
 
 export function useWebSocket(options: UseWebSocketOptions = {}) {
-  const { autoConnect = true, initialRoom = '' } = options
+  const { autoConnect = true, initialRoom = '', role = 'player' } = options
   const { user, tokens } = useAuthStore()
 
   const [status, setStatus] = useState<ConnectionStatus>('CLOSED')
   const [currentRoom, setCurrentRoom] = useState<string>(initialRoom)
   const [members, setMembers] = useState<PlayerInfo[]>([])
+  const [spectatorCount, setSpectatorCount] = useState<number>(0)
   const [events, setEvents] = useState<EventEnvelope[]>([])
   const [isReady, setIsReady] = useState<boolean>(false)
 
   const socketRef = useRef<WebSocket | null>(null)
   const reconnectTimeoutRef = useRef<number | null>(null)
+  const pingIntervalRef = useRef<number | null>(null)
   const shouldReconnectRef = useRef<boolean>(true)
+  const lastSequenceRef = useRef<number>(0)
+  const sessionIdRef = useRef<string>(
+    'sess_' + (user?.id || 'guest') + '_' + Math.random().toString(36).substring(2, 9)
+  )
+  const reconnectAttemptsRef = useRef<number>(0)
 
   const addEvent = useCallback((event: EventEnvelope) => {
+    if (event.sequence && event.sequence > lastSequenceRef.current) {
+      lastSequenceRef.current = event.sequence
+    }
     setEvents((prev) => [event, ...prev.slice(0, 49)]) // Keep last 50 events
   }, [])
 
@@ -48,7 +59,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       return
     }
 
-    setStatus('CONNECTING')
+    setStatus((prev) => (prev === 'CLOSED' ? 'CONNECTING' : 'RECONNECTING'))
 
     // Determine host and protocol
     const isSecure = window.location.protocol === 'https:'
@@ -70,6 +81,10 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       params.append('guest_name', 'Guest_' + Math.random().toString(36).substring(2, 6))
     }
 
+    if (role === 'spectator') {
+      params.append('role', 'spectator')
+    }
+
     if (currentRoom) {
       params.append('room', currentRoom)
     }
@@ -82,12 +97,37 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
 
       ws.onopen = () => {
         setStatus('OPEN')
+        reconnectAttemptsRef.current = 0
+
+        // If reconnecting to an active room, issue session.reconnect
+        if (currentRoom && lastSequenceRef.current > 0) {
+          const reconnEnv: EventEnvelope = {
+            type: 'session.reconnect',
+            room_id: currentRoom,
+            timestamp: Date.now(),
+            payload: {
+              session_id: sessionIdRef.current,
+              room_id: currentRoom,
+              last_sequence: lastSequenceRef.current,
+            },
+          }
+          ws.send(JSON.stringify(reconnEnv))
+        }
+
         addEvent({
           type: 'client.connected',
           room_id: currentRoom,
           timestamp: Date.now(),
           payload: { message: 'WebSocket connection opened' },
         })
+
+        // Setup ping heartbeat (every 25 seconds)
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current)
+        pingIntervalRef.current = window.setInterval(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({ type: 'room.ping', room_id: currentRoom, timestamp: Date.now() }))
+          }
+        }, 25000)
       }
 
       ws.onmessage = (messageEvent) => {
@@ -96,10 +136,92 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
           addEvent(envelope)
 
           switch (envelope.type) {
+            case 'session.reconnected': {
+              const payload = envelope.payload as {
+                session_id: string
+                room_id: string
+                current_sequence: number
+                missed_events: EventEnvelope[]
+                game_state?: any
+                members: PlayerInfo[]
+              }
+              if (payload) {
+                if (payload.members) setMembers(payload.members)
+                if (payload.current_sequence) lastSequenceRef.current = payload.current_sequence
+
+                // Deliver authoritative game state
+                if (payload.game_state) {
+                  addEvent({
+                    type: 'game.state',
+                    room_id: payload.room_id,
+                    sequence: payload.current_sequence,
+                    timestamp: Date.now(),
+                    payload: payload.game_state,
+                  })
+                }
+
+                // Replay missed events
+                if (payload.missed_events?.length > 0) {
+                  for (const missed of payload.missed_events) {
+                    addEvent(missed)
+                  }
+                }
+
+                toast.success('Connection Restored!', 'Rejoined match desk without losing game state.')
+              }
+              break
+            }
+
+            case 'player.reconnecting': {
+              const payload = envelope.payload as { user_id: string; username: string; grace_period_seconds: number }
+              if (payload) {
+                toast.warning('Classmate Dropped', `@${payload.username} disconnected. Waiting ${payload.grace_period_seconds}s for reconnection...`)
+              }
+              break
+            }
+
+            case 'player.reconnected': {
+              const payload = envelope.payload as { user_id: string; username: string }
+              if (payload) {
+                toast.success('Classmate Reconnected', `@${payload.username} resumed the match!`)
+              }
+              break
+            }
+
+            case 'spectator.joined': {
+              const payload = envelope.payload as { user_id: string; username: string; count: number }
+              if (payload) {
+                setSpectatorCount(payload.count)
+                if (role !== 'spectator') {
+                  toast.info('Bystander on Sideline', `@${payload.username} joined to watch!`)
+                }
+              }
+              break
+            }
+
+            case 'spectator.left': {
+              const payload = envelope.payload as { user_id: string; username: string; count: number }
+              if (payload) {
+                setSpectatorCount(payload.count)
+              }
+              break
+            }
+
+            case 'spectator.count': {
+              const payload = envelope.payload as { count: number }
+              if (payload) {
+                setSpectatorCount(payload.count)
+              }
+              break
+            }
+
             case 'room.state': {
-              const payload = envelope.payload as { room_id: string; members: PlayerInfo[] }
+              const payload = envelope.payload as { room_id: string; members: PlayerInfo[]; spectator_count?: number }
               setCurrentRoom(payload.room_id)
               setMembers(payload.members || [])
+              if (payload.spectator_count !== undefined) {
+                setSpectatorCount(payload.spectator_count)
+              }
               const me = (payload.members || []).find((m) => m.user_id === user?.id || m.username === user?.username)
               if (me) {
                 setIsReady(me.is_ready)
@@ -172,7 +294,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       }
 
       ws.onclose = () => {
-        setStatus('CLOSED')
+        setStatus('RECONNECTING')
+        if (pingIntervalRef.current) clearInterval(pingIntervalRef.current)
+
         addEvent({
           type: 'client.disconnected',
           room_id: currentRoom,
@@ -181,9 +305,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         })
 
         if (shouldReconnectRef.current) {
+          reconnectAttemptsRef.current++
+          const delay = Math.min(10000, 1000 * Math.pow(1.5, reconnectAttemptsRef.current))
           reconnectTimeoutRef.current = window.setTimeout(() => {
             connect()
-          }, 3000)
+          }, delay)
+        } else {
+          setStatus('CLOSED')
         }
       }
 
@@ -195,7 +323,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       console.error('Failed to instantiate WebSocket:', err)
       setStatus('CLOSED')
     }
-  }, [user, tokens, currentRoom, addEvent])
+  }, [user, tokens, currentRoom, role, addEvent])
 
   useEffect(() => {
     shouldReconnectRef.current = true
@@ -207,6 +335,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       shouldReconnectRef.current = false
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current)
+      }
+      if (pingIntervalRef.current) {
+        clearInterval(pingIntervalRef.current)
       }
       if (socketRef.current) {
         socketRef.current.close()
@@ -236,18 +367,19 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     }
   }, [currentRoom])
 
-  const joinRoom = useCallback((roomId: string, passcode?: string) => {
+  const joinRoom = useCallback((roomId: string, passcode?: string, joinRole?: 'player' | 'spectator') => {
     const clean = roomId.trim().toUpperCase()
     if (!clean) return
     setCurrentRoom(clean)
-    sendEvent('room.join', { passcode }, clean)
-  }, [sendEvent])
+    sendEvent('room.join', { passcode, role: joinRole || role }, clean)
+  }, [role, sendEvent])
 
   const leaveRoom = useCallback(() => {
     if (!currentRoom) return
     sendEvent('room.leave', {}, currentRoom)
     setCurrentRoom('')
     setMembers([])
+    setSpectatorCount(0)
     setIsReady(false)
   }, [currentRoom, sendEvent])
 
@@ -265,6 +397,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     status,
     currentRoom,
     members,
+    spectatorCount,
     events,
     isReady,
     connect,

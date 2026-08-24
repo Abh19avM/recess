@@ -24,6 +24,23 @@ const (
 
 	// Broadcast / Custom Event
 	EventMessage EventType = "room.message"
+
+	// Game Engine Events
+	EventGameStart   EventType = "game.start"
+	EventGameMove    EventType = "game.move"
+	EventGameState   EventType = "game.state"
+	EventGameRematch EventType = "game.rematch"
+
+	// Session Reconnection Events
+	EventSessionReconnect   EventType = "session.reconnect"
+	EventSessionReconnected EventType = "session.reconnected"
+	EventPlayerReconnecting EventType = "player.reconnecting"
+	EventPlayerReconnected  EventType = "player.reconnected"
+
+	// Spectator Mode Events
+	EventSpectatorJoined EventType = "spectator.joined"
+	EventSpectatorLeft   EventType = "spectator.left"
+	EventSpectatorCount  EventType = "spectator.count"
 )
 
 // EventEnvelope is the uniform message format for all WebSocket communications.
@@ -47,12 +64,34 @@ type PlayerInfo struct {
 // RoomJoinPayload is sent by a client requesting to join a room.
 type RoomJoinPayload struct {
 	Passcode string `json:"passcode,omitempty"`
+	Role     string `json:"role,omitempty"` // "player" or "spectator"
 }
 
 // RoomStatePayload is sent to a newly joined client detailing the room's current state.
 type RoomStatePayload struct {
-	RoomID  string       `json:"room_id"`
-	Members []PlayerInfo `json:"members"`
+	RoomID         string       `json:"room_id"`
+	Members        []PlayerInfo `json:"members"`
+	SpectatorCount int          `json:"spectator_count"`
+}
+
+// SpectatorCountPayload is broadcast when the spectator count changes.
+type SpectatorCountPayload struct {
+	RoomID string `json:"room_id"`
+	Count  int    `json:"count"`
+}
+
+// SpectatorJoinedPayload is broadcast when a spectator joins the sideline.
+type SpectatorJoinedPayload struct {
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
+	Count    int    `json:"count"`
+}
+
+// SpectatorLeftPayload is broadcast when a spectator departs the sideline.
+type SpectatorLeftPayload struct {
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
+	Count    int    `json:"count"`
 }
 
 // PlayerJoinedPayload is broadcast to room members when a new player joins.
@@ -91,6 +130,43 @@ type MessagePayload struct {
 	SenderID string `json:"sender_id"`
 	Sender   string `json:"sender"`
 	Text     string `json:"text"`
+}
+
+// SessionReconnectPayload is sent by a reconnecting client.
+type SessionReconnectPayload struct {
+	SessionID    string `json:"session_id"`
+	RoomID       string `json:"room_id"`
+	LastSequence int64  `json:"last_sequence"`
+}
+
+// SessionReconnectedPayload is returned to a reconnected client with state snapshot and missed events.
+type SessionReconnectedPayload struct {
+	SessionID       string           `json:"session_id"`
+	RoomID          string           `json:"room_id"`
+	CurrentSequence int64            `json:"current_sequence"`
+	MissedEvents    []*EventEnvelope `json:"missed_events"`
+	GameState       any              `json:"game_state,omitempty"`
+	Members         []PlayerInfo     `json:"members"`
+}
+
+// PlayerReconnectingPayload is broadcast when a player abruptly disconnects during an active game.
+type PlayerReconnectingPayload struct {
+	UserID             string `json:"user_id"`
+	Username           string `json:"username"`
+	GracePeriodSeconds int    `json:"grace_period_seconds"`
+}
+
+// PlayerReconnectedPayload is broadcast when a disconnected player resumes their session.
+type PlayerReconnectedPayload struct {
+	UserID   string `json:"user_id"`
+	Username string `json:"username"`
+}
+
+// DistributedEnvelope wraps an EventEnvelope with origin instance metadata for Redis Pub/Sub routing.
+type DistributedEnvelope struct {
+	OriginInstanceID string         `json:"origin_instance_id"`
+	RoomID           string         `json:"room_id"`
+	Envelope         *EventEnvelope `json:"envelope"`
 }
 
 // NewEnvelope creates a new EventEnvelope with the current Unix timestamp in milliseconds.

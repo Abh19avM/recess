@@ -6,6 +6,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/Abh19avM/recess/internal/metrics"
 )
 
 // Config holds all runtime configuration values for the application.
@@ -65,7 +67,7 @@ func (c *Config) SetupLogger() *slog.Logger {
 		handler = slog.NewTextHandler(os.Stdout, opts)
 	}
 
-	logger := slog.New(handler)
+	logger := slog.New(metrics.NewRedactingHandler(handler))
 	slog.SetDefault(logger)
 	return logger
 }

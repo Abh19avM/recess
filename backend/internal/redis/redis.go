@@ -16,6 +16,9 @@ type Client struct {
 
 // New initializes a new Redis client from a connection URL with connection pooling.
 func New(ctx context.Context, redisURL string) (*Client, error) {
+	if redisURL == "" || redisURL == "in-memory" {
+		return nil, fmt.Errorf("redis URL not configured (in-memory mode)")
+	}
 	opts, err := redis.ParseURL(redisURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse redis URL: %w", err)

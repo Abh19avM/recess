@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
 import { PaperCard } from '../components/ui/PaperCard'
 import { Button } from '../components/ui/Button'
@@ -7,15 +7,18 @@ import { Input } from '../components/ui/Input'
 import { Badge, Stamp } from '../components/ui/Badge'
 import { Avatar } from '../components/ui/Avatar'
 import { Modal } from '../components/ui/Modal'
+import { MatchmakingModal } from '../components/ui/MatchmakingModal'
 import { Swords, Users, PlusCircle, Play } from 'lucide-react'
 import { toast } from '../store/toastStore'
 import { api } from '../lib/api'
 
 export const DashboardPage: React.FC = () => {
+  const navigate = useNavigate()
   const { user, profileStats, fetchMe } = useAuthStore()
 
   const [roomCode, setRoomCode] = useState('')
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [matchmakingGame, setMatchmakingGame] = useState<{ id: string; title: string; icon: string } | null>(null)
   const [selectedGame, setSelectedGame] = useState('hand_cricket')
   const [roomTitle, setRoomTitle] = useState('')
   const [isPrivate, setIsPrivate] = useState(false)
@@ -38,7 +41,7 @@ export const DashboardPage: React.FC = () => {
       setActiveRooms([
         {
           id: '1',
-          code: 'RECESS-7X9P',
+          code: 'RECESS-HC-7X9P',
           title: 'Hand Cricket Championship',
           game_type: 'hand_cricket',
           host: 'ArbiterRecess',
@@ -47,10 +50,10 @@ export const DashboardPage: React.FC = () => {
         },
         {
           id: '2',
-          code: 'RECESS-4B2K',
-          title: 'Graph Paper Conquest',
+          code: 'RECESS-DOTS-4B1L',
+          title: 'Graph Paper Showdown',
           game_type: 'dots_boxes',
-          host: 'PencilMaster',
+          host: 'SchoolCaptain',
           current_players: 1,
           max_players: 2,
         },
@@ -65,18 +68,31 @@ export const DashboardPage: React.FC = () => {
     const cleanCode = roomCode.trim().toUpperCase()
     if (!cleanCode) return
 
-    toast.info('Joining Classroom Room...', cleanCode)
-    // Route to arena (prepared for Phase 6)
-    toast.success('Room found!', `Connecting to ${cleanCode}`)
+    toast.info('Entering Classroom Desk...', cleanCode)
+    if (cleanCode.includes('CRICKET') || cleanCode.includes('HC')) {
+      navigate(`/games/hand-cricket/${cleanCode}`)
+    } else if (cleanCode.includes('DOT') || cleanCode.includes('BOX') || cleanCode.includes('DB')) {
+      navigate(`/games/dots-and-boxes/${cleanCode}`)
+    } else {
+      navigate(`/games/xo/${cleanCode}`)
+    }
   }
 
   const handleCreateRoom = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const generatedCode = `RECESS-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
+      const prefix = selectedGame === 'hand_cricket' ? 'HC' : selectedGame === 'dots_boxes' ? 'DOTS' : 'XO'
+      const generatedCode = `RECESS-${prefix}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`
       setIsCreateModalOpen(false)
       toast.success('Lobby Created!', `Room code: ${generatedCode}`)
-      loadRooms()
+      
+      if (selectedGame === 'hand_cricket') {
+        navigate(`/games/hand-cricket/${generatedCode}`)
+      } else if (selectedGame === 'dots_boxes') {
+        navigate(`/games/dots-and-boxes/${generatedCode}`)
+      } else {
+        navigate(`/games/xo/${generatedCode}`)
+      }
     } catch (err: any) {
       toast.error('Failed to create room', err.message)
     }
@@ -220,8 +236,11 @@ export const DashboardPage: React.FC = () => {
               variant="plain"
               className="p-4 text-center hover:shadow-[4px_4px_0px_0px_#1E242B] hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center justify-between group"
               onClick={() => {
-                setSelectedGame(game.id)
-                setIsCreateModalOpen(true)
+                setMatchmakingGame({
+                  id: game.id,
+                  title: game.name,
+                  icon: game.icon,
+                })
               }}
             >
               <span className="text-3xl mb-2">{game.icon}</span>
@@ -279,7 +298,15 @@ export const DashboardPage: React.FC = () => {
                 </div>
 
                 <Button
-                  onClick={() => toast.success('Joining Desk...', room.code)}
+                  onClick={() => {
+                    if (room.game_type === 'hand_cricket') {
+                      navigate(`/games/hand-cricket/${room.code}`)
+                    } else if (room.game_type === 'dots_boxes') {
+                      navigate(`/games/dots-and-boxes/${room.code}`)
+                    } else {
+                      navigate(`/games/xo/${room.code}`)
+                    }
+                  }}
                   variant="primary"
                   size="sm"
                   leftIcon={<Play className="w-3.5 h-3.5" />}
@@ -363,6 +390,17 @@ export const DashboardPage: React.FC = () => {
           </div>
         </form>
       </Modal>
+
+      {/* Matchmaking Queue Modal */}
+      {matchmakingGame && (
+        <MatchmakingModal
+          isOpen={!!matchmakingGame}
+          onClose={() => setMatchmakingGame(null)}
+          gameId={matchmakingGame.id}
+          gameTitle={matchmakingGame.title}
+          gameIcon={matchmakingGame.icon}
+        />
+      )}
     </div>
   )
 }

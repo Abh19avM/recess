@@ -1,0 +1,11 @@
+apiVersion: 1
+
+providers:
+  - name: 'Recess Dashboards'
+    orgId: 1
+    folder: 'Recess Platform'
+    type: file
+    disableDeletion: false
+    editable: true
+    options:
+      path: /etc/grafana/provisioning/dashboards/json

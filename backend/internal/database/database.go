@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/Abh19avM/recess/internal/metrics"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -16,18 +17,24 @@ type Database struct {
 
 // New initializes a connection pool to the PostgreSQL database with production-ready connection pool settings.
 func New(ctx context.Context, databaseURL string) (*Database, error) {
+	if databaseURL == "" || databaseURL == "in-memory" {
+		return nil, fmt.Errorf("database URL not configured (in-memory mode)")
+	}
 	config, err := pgxpool.ParseConfig(databaseURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse database configuration: %w", err)
 	}
 
 	config.MaxConns = 25
-	config.MinConns = 2
+	config.MinConns = 0
 	config.MaxConnLifetime = 1 * time.Hour
 	config.MaxConnIdleTime = 30 * time.Minute
 	config.HealthCheckPeriod = 1 * time.Minute
+	if config.ConnConfig.ConnectTimeout == 0 {
+		config.ConnConfig.ConnectTimeout = 2 * time.Second
+	}
 
-	connectCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	connectCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
 	defer cancel()
 
 	pool, err := pgxpool.NewWithConfig(connectCtx, config)
@@ -56,6 +63,7 @@ func (d *Database) Ping(ctx context.Context) (time.Duration, error) {
 	if d == nil || d.Pool == nil {
 		return 0, fmt.Errorf("database connection pool not initialized")
 	}
+	defer metrics.ObserveDB("ping", "system", time.Now())
 	start := time.Now()
 	err := d.Pool.Ping(ctx)
 	latency := time.Since(start)

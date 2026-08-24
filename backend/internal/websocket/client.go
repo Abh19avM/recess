@@ -36,7 +36,9 @@ type Client struct {
 	IsGuest      bool
 	AvatarPreset string
 	RoomID       string
+	SessionID    string
 	IsReady      bool
+	IsSpectator  bool
 }
 
 // NewClient initializes a new Client wrapper.
@@ -50,8 +52,24 @@ func NewClient(hub *Hub, conn *websocket.Conn, clientID, userID, username string
 		Username:     username,
 		IsGuest:      isGuest,
 		AvatarPreset: avatarPreset,
+		SessionID:    "sess_" + clientID,
 		IsReady:      false,
+		IsSpectator:  false,
 	}
+}
+
+// SetSpectator updates the client's spectator status.
+func (c *Client) SetSpectator(isSpectator bool) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.IsSpectator = isSpectator
+}
+
+// GetSpectator returns whether the client is a spectator.
+func (c *Client) GetSpectator() bool {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.IsSpectator
 }
 
 // PlayerInfo returns a snapshot of the client's public state in a room.
@@ -79,6 +97,20 @@ func (c *Client) GetRoomID() string {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 	return c.RoomID
+}
+
+// SetSessionID updates the client's session ID.
+func (c *Client) SetSessionID(sessionID string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	c.SessionID = sessionID
+}
+
+// GetSessionID returns the client's session ID.
+func (c *Client) GetSessionID() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+	return c.SessionID
 }
 
 // SetReady updates the client's ready status.

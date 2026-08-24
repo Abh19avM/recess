@@ -8,6 +8,13 @@ import { DashboardPage } from './pages/DashboardPage'
 import { GamesPage } from './pages/GamesPage'
 import { ProfilePage } from './pages/ProfilePage'
 import { WebSocketTestPage } from './pages/WebSocketTestPage'
+import { XOArenaPage } from './pages/XOArenaPage'
+import { HandCricketArenaPage } from './pages/HandCricketArenaPage'
+import { DotsBoxesArenaPage } from './pages/DotsBoxesArenaPage'
+import { Connect4ArenaPage } from './pages/Connect4ArenaPage'
+import { PaperFootballArenaPage } from './pages/PaperFootballArenaPage'
+import { NPATArenaPage } from './pages/NPATArenaPage'
+import { SpectatorArenaPage } from './pages/SpectatorArenaPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 import { EmptyState } from './components/ui/EmptyState'
 
@@ -30,6 +37,20 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/games" element={<GamesPage />} />
+            <Route path="/games/xo" element={<XOArenaPage />} />
+            <Route path="/games/xo/:roomId" element={<XOArenaPage />} />
+            <Route path="/games/hand-cricket" element={<HandCricketArenaPage />} />
+            <Route path="/games/hand-cricket/:roomId" element={<HandCricketArenaPage />} />
+            <Route path="/games/dots-and-boxes" element={<DotsBoxesArenaPage />} />
+            <Route path="/games/dots-and-boxes/:roomId" element={<DotsBoxesArenaPage />} />
+            <Route path="/games/connect-4" element={<Connect4ArenaPage />} />
+            <Route path="/games/connect-4/:roomId" element={<Connect4ArenaPage />} />
+            <Route path="/games/paper-football" element={<PaperFootballArenaPage />} />
+            <Route path="/games/paper-football/:roomId" element={<PaperFootballArenaPage />} />
+            <Route path="/games/npat" element={<NPATArenaPage />} />
+            <Route path="/games/npat/:roomId" element={<NPATArenaPage />} />
+            <Route path="/spectate/:roomId" element={<SpectatorArenaPage />} />
+            <Route path="/spectate/:gameType/:roomId" element={<SpectatorArenaPage />} />
             <Route path="/ws-test" element={<WebSocketTestPage />} />
             
             {/* Protected Routes */}

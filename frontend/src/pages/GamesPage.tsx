@@ -3,12 +3,21 @@ import { useNavigate } from 'react-router-dom'
 import { PaperCard } from '../components/ui/PaperCard'
 import { Button } from '../components/ui/Button'
 import { Badge, Stamp } from '../components/ui/Badge'
-import { Swords, Users, BookOpen } from 'lucide-react'
-import { toast } from '../store/toastStore'
+import { MatchmakingModal } from '../components/ui/MatchmakingModal'
+import { Swords, Users, BookOpen, Eye, Radio } from 'lucide-react'
 
 export const GamesPage: React.FC = () => {
   const navigate = useNavigate()
   const [filter, setFilter] = useState<'all' | '2p' | 'turn' | 'strategy'>('all')
+  const [matchmakingGame, setMatchmakingGame] = useState<{ id: string; title: string; icon: string } | null>(null)
+  const [spectateRoomId, setSpectateRoomId] = useState('')
+
+  const handleSpectate = (e: React.FormEvent) => {
+    e.preventDefault()
+    const clean = spectateRoomId.trim().toUpperCase()
+    if (!clean) return
+    navigate(`/spectate/${clean}`)
+  }
 
   const games = [
     {
@@ -197,6 +206,45 @@ export const GamesPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Sideline Spectator Live Bar */}
+      <div className="bg-white border-2 border-[#4A6B82]/30 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-300 flex items-center justify-center text-red-600">
+            <Radio className="w-5 h-5 animate-pulse" />
+          </div>
+          <div>
+            <h3 className="font-bold text-sm text-[#2C3E50] flex items-center gap-2">
+              Schoolyard Sideline Spectate
+              <span className="text-[10px] px-2 py-0.5 bg-red-100 text-red-700 font-extrabold rounded-full">
+                LIVE
+              </span>
+            </h3>
+            <p className="font-hand text-xs text-[#475569]">
+              Watch any active desk duel in real time as a bystander without making moves.
+            </p>
+          </div>
+        </div>
+
+        <form onSubmit={handleSpectate} className="flex items-center gap-2 w-full md:w-auto">
+          <input
+            type="text"
+            value={spectateRoomId}
+            onChange={(e) => setSpectateRoomId(e.target.value)}
+            placeholder="Enter Room Code (e.g. RECESS-XO)"
+            className="px-3.5 py-2 text-xs font-mono bg-[#FBF9F1] border-2 border-[#4A6B82]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A6B82]/40 w-full sm:w-64"
+          />
+          <Button
+            type="submit"
+            variant="primary"
+            size="sm"
+            disabled={!spectateRoomId.trim()}
+            leftIcon={<Eye className="w-4 h-4" />}
+          >
+            Watch Match
+          </Button>
+        </form>
+      </div>
+
       {/* Games List */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {filteredGames.map((game) => (
@@ -260,31 +308,59 @@ export const GamesPage: React.FC = () => {
             <div className="pt-6 mt-6 border-t border-[#CBD5E1] flex items-center justify-between gap-3">
               <Button
                 onClick={() => {
-                  toast.info('Joining Matchmaking Queue...', game.title)
-                  navigate('/dashboard')
+                  setMatchmakingGame({
+                    id: game.id,
+                    title: game.title,
+                    icon: game.icon,
+                  })
                 }}
                 variant="primary"
                 size="md"
                 className="flex-1"
                 leftIcon={<Swords className="w-4 h-4" />}
               >
-                Ranked Match
+                Find Match
               </Button>
               <Button
                 onClick={() => {
-                  navigate('/dashboard')
+                  if (game.id === 'tic_tac_toe') {
+                    navigate('/games/xo')
+                  } else if (game.id === 'hand_cricket') {
+                    navigate('/games/hand-cricket')
+                  } else if (game.id === 'dots_boxes') {
+                    navigate('/games/dots-and-boxes')
+                  } else if (game.id === 'connect_4') {
+                    navigate('/games/connect-4')
+                  } else if (game.id === 'paper_football') {
+                    navigate('/games/paper-football')
+                  } else if (game.id === 'name_place_animal_thing' || game.id === 'npat') {
+                    navigate('/games/npat')
+                  } else {
+                    navigate('/dashboard')
+                  }
                 }}
                 variant="secondary"
                 size="md"
                 className="flex-1"
                 leftIcon={<Users className="w-4 h-4" />}
               >
-                Create Room
+                Enter Arena
               </Button>
             </div>
           </PaperCard>
         ))}
       </div>
+
+      {/* Matchmaking Queue Modal */}
+      {matchmakingGame && (
+        <MatchmakingModal
+          isOpen={!!matchmakingGame}
+          onClose={() => setMatchmakingGame(null)}
+          gameId={matchmakingGame.id}
+          gameTitle={matchmakingGame.title}
+          gameIcon={matchmakingGame.icon}
+        />
+      )}
     </div>
   )
 }
