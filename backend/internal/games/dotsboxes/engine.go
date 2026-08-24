@@ -103,10 +103,10 @@ func (e *Engine) Initialize(gameID string, players []engine.Player, config json.
 			Cols int `json:"cols"`
 		}
 		if err := json.Unmarshal(config, &cfg); err == nil {
-			if cfg.Rows >= 1 && cfg.Rows <= 6 {
+			if cfg.Rows >= 1 && cfg.Rows <= 8 {
 				e.rows = cfg.Rows
 			}
-			if cfg.Cols >= 1 && cfg.Cols <= 6 {
+			if cfg.Cols >= 1 && cfg.Cols <= 8 {
 				e.cols = cfg.Cols
 			}
 		}

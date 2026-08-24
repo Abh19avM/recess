@@ -35,8 +35,8 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <label
             htmlFor={inputId}
             className={cn(
-              'block text-sm font-semibold text-[#1E242B]',
-              handwrittenLabel && 'font-hand text-base text-[#1A365D]'
+              'block text-sm font-semibold text-[#1E242B] dark:text-[#F8FAFC]',
+              handwrittenLabel && 'font-hand text-base text-[#1A365D] dark:text-[#93C5FD]'
             )}
           >
             {label}
@@ -45,7 +45,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
         <div className="relative flex items-center">
           {leftIcon && (
-            <div className="absolute left-3 flex items-center pointer-events-none text-[#475569]">
+            <div className="absolute left-3 flex items-center pointer-events-none text-[#475569] dark:text-[#94A3B8]">
               {leftIcon}
             </div>
           )}
@@ -54,14 +54,14 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
             id={inputId}
             ref={ref}
             className={cn(
-              'w-full text-sm text-[#1E242B] placeholder:text-[#94A3B8] transition-all outline-none bg-white',
+              'w-full text-sm text-[#1E242B] dark:text-[#F8FAFC] placeholder:text-[#94A3B8] dark:placeholder:text-[#64748B] transition-all outline-none bg-white dark:bg-[#101726]',
               variant === 'sketch' &&
-                'px-3.5 py-2.5 rounded-md border-2 border-[#475569] shadow-[2px_2px_0px_0px_#475569] focus:border-[#1A365D] focus:shadow-[3px_3px_0px_0px_#1A365D]',
+                'px-3.5 py-2.5 rounded-md border-2 border-[#475569] dark:border-[#334155] shadow-[2px_2px_0px_0px_#475569] dark:shadow-[2px_2px_0px_0px_#020617] focus:border-[#1A365D] dark:focus:border-[#60A5FA] focus:shadow-[3px_3px_0px_0px_#1A365D] dark:focus:shadow-[3px_3px_0px_0px_#020617]',
               variant === 'notebook-line' &&
-                'px-2 py-1.5 bg-transparent border-b-2 border-[#1E242B] rounded-none focus:border-[#1A365D]',
-              leftIcon && 'pl-10',
-              rightIcon && 'pr-10',
-              error && 'border-[#991B1B] shadow-[2px_2px_0px_0px_#991B1B] focus:border-[#991B1B]',
+                'bg-transparent border-b-2 border-[#CBD5E1] dark:border-[#334155] rounded-none py-1.5 focus:border-[#1A365D] dark:focus:border-[#60A5FA]',
+              leftIcon && 'pl-9',
+              rightIcon && 'pr-9',
+              error && 'border-[#991B1B] dark:border-[#EF4444] text-[#991B1B] dark:text-[#FCA5A5] focus:border-[#991B1B]',
               className
             )}
             {...props}

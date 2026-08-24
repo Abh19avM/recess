@@ -1,15 +1,17 @@
 import React from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
+import { useThemeStore } from '../../store/themeStore'
 import { Button } from '../ui/Button'
 import { Avatar } from '../ui/Avatar'
 import { Stamp } from '../ui/Badge'
-import { LogOut, LayoutDashboard, Dices, Sparkles, Wifi } from 'lucide-react'
+import { LogOut, LayoutDashboard, Dices, Sparkles, Wifi, Sun, Moon } from 'lucide-react'
 
 export const Navbar: React.FC = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const { user, isAuthenticated, logout, guestLogin, isLoading } = useAuthStore()
+  const { theme, toggleTheme } = useThemeStore()
 
   const navLinks = [
     { name: 'Play Games', path: '/games', icon: <Dices className="w-4 h-4" /> },
@@ -76,20 +78,41 @@ export const Navbar: React.FC = () => {
             </nav>
           </div>
 
-          {/* Right Action Items / Student Profile */}
-          <div className="flex items-center gap-3">
+          {/* Right Action Items / Student Profile & Theme Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Dark Mode Toggle Button */}
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className="p-1.5 rounded-md border-2 border-[#CBD5E1] dark:border-[#334155] bg-[#FBF9F3] dark:bg-[#15201A] text-[#1E242B] dark:text-[#F1F5F9] hover:bg-[#F2EDE0] dark:hover:bg-[#1F2E25] transition-all shadow-[2px_2px_0px_0px_#1E242B] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 text-xs font-mono"
+              title={theme === 'dark' ? 'Switch to Day Class ☀️' : 'Switch to Night Chalkboard 🌙'}
+              aria-label="Toggle Chalkboard Dark Mode"
+            >
+              {theme === 'dark' ? (
+                <>
+                  <Moon className="w-4 h-4 text-[#FCD34D]" />
+                  <span className="hidden lg:inline text-[10px] font-bold text-[#FCD34D]">NIGHT</span>
+                </>
+              ) : (
+                <>
+                  <Sun className="w-4 h-4 text-[#B45309]" />
+                  <span className="hidden lg:inline text-[10px] font-bold text-[#475569]">DAY</span>
+                </>
+              )}
+            </button>
+
             {isAuthenticated && user ? (
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-3 py-1.5 rounded-md bg-[#FBF9F3] border-2 border-[#CBD5E1] hover:border-[#1A365D] transition-colors shadow-xs"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#FBF9F3] dark:bg-[#15201A] border-2 border-[#CBD5E1] dark:border-[#334155] hover:border-[#1A365D] transition-colors shadow-xs"
                 >
                   <Avatar username={user.username} preset={user.avatar_preset} size="sm" isOnline />
                   <div className="text-left hidden sm:block">
-                    <p className="text-xs font-bold text-[#1E242B] leading-none">
+                    <p className="text-xs font-bold text-[#1E242B] dark:text-[#F1F5F9] leading-none">
                       {user.username}
                     </p>
-                    <p className="text-[10px] font-mono text-[#15803D] font-semibold">
+                    <p className="text-[10px] font-mono text-[#15803D] dark:text-[#86EFAC] font-semibold">
                       {user.rating} ELO {user.is_guest && '(Guest)'}
                     </p>
                   </div>
@@ -100,13 +123,13 @@ export const Navbar: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   aria-label="Logout"
-                  className="text-[#475569] hover:text-[#991B1B]"
+                  className="text-[#475569] dark:text-[#94A3B8] hover:text-[#991B1B]"
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <Button
                   onClick={handleGuestPlay}
                   isLoading={isLoading}

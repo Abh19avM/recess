@@ -34,8 +34,9 @@ export const DashboardPage: React.FC = () => {
   const loadRooms = async () => {
     setIsLoadingRooms(true)
     try {
-      const resp = await api.get<any[]>('/rooms')
-      setActiveRooms(resp || [])
+      const resp = await api.get<any>('/rooms')
+      const roomsList = Array.isArray(resp) ? resp : (resp?.rooms || [])
+      setActiveRooms(Array.isArray(roomsList) ? roomsList : [])
     } catch {
       // Fallback demo rooms if API not seeded
       setActiveRooms([
@@ -277,44 +278,52 @@ export const DashboardPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {activeRooms.map((room) => (
-              <div
-                key={room.id}
-                className="bg-white rounded p-4 border-2 border-[#1E242B] shadow-[3px_3px_0px_0px_#1E242B] flex items-center justify-between"
-              >
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono font-bold text-xs bg-[#F2EDE0] px-2 py-0.5 rounded border border-[#CBD5E1]">
-                      {room.code}
-                    </span>
-                    <Badge variant="ink-blue" size="sm">
-                      {room.game_type}
-                    </Badge>
-                  </div>
-                  <h4 className="font-bold text-sm text-[#1E242B] mt-1">{room.title}</h4>
-                  <p className="text-xs text-[#475569] font-hand">
-                    Hosted by @{room.host || 'Classmate'}
-                  </p>
-                </div>
-
-                <Button
-                  onClick={() => {
-                    if (room.game_type === 'hand_cricket') {
-                      navigate(`/games/hand-cricket/${room.code}`)
-                    } else if (room.game_type === 'dots_boxes') {
-                      navigate(`/games/dots-and-boxes/${room.code}`)
-                    } else {
-                      navigate(`/games/xo/${room.code}`)
-                    }
-                  }}
-                  variant="primary"
-                  size="sm"
-                  leftIcon={<Play className="w-3.5 h-3.5" />}
+            {activeRooms.length > 0 ? (
+              activeRooms.map((room) => (
+                <div
+                  key={room.id}
+                  className="bg-white rounded p-4 border-2 border-[#1E242B] shadow-[3px_3px_0px_0px_#1E242B] flex items-center justify-between"
                 >
-                  Seat In
-                </Button>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono font-bold text-xs bg-[#F2EDE0] px-2 py-0.5 rounded border border-[#CBD5E1]">
+                        {room.code}
+                      </span>
+                      <Badge variant="ink-blue" size="sm">
+                        {room.game_type}
+                      </Badge>
+                    </div>
+                    <h4 className="font-bold text-sm text-[#1E242B] mt-1">{room.title}</h4>
+                    <p className="text-xs text-[#475569] font-hand">
+                      Hosted by @{room.host || 'Classmate'}
+                    </p>
+                  </div>
+
+                  <Button
+                    onClick={() => {
+                      if (room.game_type === 'hand_cricket') {
+                        navigate(`/games/hand-cricket/${room.code}`)
+                      } else if (room.game_type === 'dots_boxes') {
+                        navigate(`/games/dots-and-boxes/${room.code}`)
+                      } else {
+                        navigate(`/games/xo/${room.code}`)
+                      }
+                    }}
+                    variant="primary"
+                    size="sm"
+                    leftIcon={<Play className="w-3.5 h-3.5" />}
+                  >
+                    Seat In
+                  </Button>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full py-6 text-center bg-white/60 rounded border-2 border-dashed border-[#CBD5E1]">
+                <p className="font-hand text-base text-[#475569]">
+                  No active desks at the moment. Pick a game above to host the first match!
+                </p>
               </div>
-            ))}
+            )}
           </div>
         </PaperCard>
       </section>

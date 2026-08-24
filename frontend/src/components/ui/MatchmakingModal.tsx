@@ -185,11 +185,11 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
         {!isSearching && !matchedGame ? (
           /* Step 1: Mode Selection & Queue Start */
           <div className="space-y-5">
-            <div className="p-4 rounded-xl bg-[#FEF9C3] border border-[#FDE047] flex items-center gap-4">
+            <div className="p-4 rounded-xl bg-[#FEF9C3] dark:bg-[#2D2106] border border-[#FDE047] dark:border-[#854D0E] flex items-center gap-4">
               <span className="text-4xl">{gameIcon}</span>
               <div>
-                <h4 className="font-bold text-base text-[#1E242B]">{gameTitle}</h4>
-                <p className="font-hand text-sm text-[#854D0E]">
+                <h4 className="font-bold text-base text-[#1E242B] dark:text-[#F8FAFC]">{gameTitle}</h4>
+                <p className="font-hand text-sm text-[#854D0E] dark:text-[#FEF08A]">
                   Find an online classmate for a live 1v1 duel across the school desks!
                 </p>
               </div>
@@ -197,7 +197,7 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
 
             {/* Mode Selector */}
             <div className="space-y-2">
-              <label className="text-xs font-bold font-mono uppercase text-[#475569]">
+              <label className="text-xs font-bold font-mono uppercase text-[#475569] dark:text-[#94A3B8]">
                 Select Play Mode:
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -206,15 +206,15 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
                   onClick={() => setMode('casual')}
                   className={`p-3 rounded-lg border-2 text-left transition-all ${
                     mode === 'casual'
-                      ? 'border-[#1A365D] bg-[#E0F2FE] shadow-[2px_2px_0px_0px_#1A365D]'
-                      : 'border-[#CBD5E1] bg-white hover:bg-slate-50'
+                      ? 'border-[#1A365D] dark:border-[#3B82F6] bg-[#E0F2FE] dark:bg-[#0B2545] shadow-[2px_2px_0px_0px_#1A365D] dark:shadow-[2px_2px_0px_0px_#020617]'
+                      : 'border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#101726] hover:bg-slate-50 dark:hover:bg-[#1E293B]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-[#1E242B]">Casual Match</span>
+                    <span className="font-bold text-sm text-[#1E242B] dark:text-[#F8FAFC]">Casual Match</span>
                     <Stamp tone="green">QUICK</Stamp>
                   </div>
-                  <p className="text-xs text-[#475569] font-hand mt-1">Instant pairing without rating stakes.</p>
+                  <p className="text-xs text-[#475569] dark:text-[#94A3B8] font-hand mt-1">Instant pairing without rating stakes.</p>
                 </button>
 
                 <button
@@ -222,15 +222,15 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
                   onClick={() => setMode('ranked')}
                   className={`p-3 rounded-lg border-2 text-left transition-all ${
                     mode === 'ranked'
-                      ? 'border-[#991B1B] bg-[#FFE4E6] shadow-[2px_2px_0px_0px_#991B1B]'
-                      : 'border-[#CBD5E1] bg-white hover:bg-slate-50'
+                      ? 'border-[#991B1B] dark:border-[#EF4444] bg-[#FFE4E6] dark:bg-[#3B1123] shadow-[2px_2px_0px_0px_#991B1B] dark:shadow-[2px_2px_0px_0px_#020617]'
+                      : 'border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#101726] hover:bg-slate-50 dark:hover:bg-[#1E293B]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-sm text-[#1E242B]">Ranked Duel</span>
+                    <span className="font-bold text-sm text-[#1E242B] dark:text-[#F8FAFC]">Ranked Duel</span>
                     <Stamp tone="red">ELO</Stamp>
                   </div>
-                  <p className="text-xs text-[#475569] font-hand mt-1">Climb the classroom leaderboard report card.</p>
+                  <p className="text-xs text-[#475569] dark:text-[#94A3B8] font-hand mt-1">Climb the classroom leaderboard report card.</p>
                 </button>
               </div>
             </div>

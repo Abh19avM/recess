@@ -35,17 +35,17 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        'bg-[#1A365D] text-white border-2 border-[#0F2238] shadow-[2px_2px_0px_0px_#0F2238] hover:shadow-[3px_3px_0px_0px_#0F2238] hover:-translate-x-[1px] hover:-translate-y-[1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
+        'bg-[#1A365D] dark:bg-[#2563EB] text-white border-2 border-[#0F2238] dark:border-[#1D4ED8] shadow-[2px_2px_0px_0px_#0F2238] dark:shadow-[2px_2px_0px_0px_#020617] hover:shadow-[3px_3px_0px_0px_#0F2238] dark:hover:shadow-[3px_3px_0px_0px_#020617] hover:-translate-x-[1px] hover:-translate-y-[1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
       secondary:
-        'bg-[#FFFFFF] text-[#1E242B] border-2 border-[#475569] shadow-[2px_2px_0px_0px_#475569] hover:bg-[#FBF9F3] hover:shadow-[3px_3px_0px_0px_#475569] hover:-translate-x-[1px] hover:-translate-y-[1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
+        'bg-[#FFFFFF] dark:bg-[#1E293B] text-[#1E242B] dark:text-[#F8FAFC] border-2 border-[#475569] dark:border-[#334155] shadow-[2px_2px_0px_0px_#475569] dark:shadow-[2px_2px_0px_0px_#020617] hover:bg-[#FBF9F3] dark:hover:bg-[#27354A] hover:shadow-[3px_3px_0px_0px_#475569] hover:-translate-x-[1px] hover:-translate-y-[1px] active:shadow-none active:translate-x-[1px] active:translate-y-[1px]',
       chalk:
-        'bg-[#18231C] text-[#F8FAFC] border-2 border-[#5c4033] shadow-[2px_2px_0px_0px_#5c4033] hover:text-[#FEF08A] hover:border-[#FEF08A]/50 active:translate-x-[1px] active:translate-y-[1px]',
+        'bg-[#18231C] dark:bg-[#0F172A] text-[#F8FAFC] border-2 border-[#5c4033] dark:border-[#475569] shadow-[2px_2px_0px_0px_#5c4033] dark:shadow-[2px_2px_0px_0px_#020617] hover:text-[#FEF08A] hover:border-[#FEF08A]/50 active:translate-x-[1px] active:translate-y-[1px]',
       danger:
-        'bg-[#991B1B] text-white border-2 border-[#7F1D1D] shadow-[2px_2px_0px_0px_#7F1D1D] hover:bg-[#B91C1C] hover:shadow-[3px_3px_0px_0px_#7F1D1D] active:shadow-none',
+        'bg-[#991B1B] dark:bg-[#DC2626] text-white border-2 border-[#7F1D1D] dark:border-[#B91C1C] shadow-[2px_2px_0px_0px_#7F1D1D] dark:shadow-[2px_2px_0px_0px_#020617] hover:bg-[#B91C1C] hover:shadow-[3px_3px_0px_0px_#7F1D1D] active:shadow-none',
       ghost:
-        'bg-transparent text-[#475569] hover:bg-[#F2EDE0] hover:text-[#1E242B] border border-transparent',
+        'bg-transparent text-[#475569] dark:text-[#94A3B8] hover:bg-[#F2EDE0] dark:hover:bg-[#1E293B] hover:text-[#1E242B] dark:hover:text-[#F8FAFC] border border-transparent',
       stamp:
-        'font-hand uppercase tracking-wider text-[#15803D] bg-[#15803D]/10 border-2 border-[#15803D] rounded hover:bg-[#15803D]/20 rotate-[-1deg] hover:rotate-[0deg]',
+        'font-hand uppercase tracking-wider text-[#15803D] dark:text-[#86EFAC] bg-[#15803D]/10 dark:bg-[#22C55E]/20 border-2 border-[#15803D] dark:border-[#22C55E] rounded hover:bg-[#15803D]/20 rotate-[-1deg] hover:rotate-[0deg]',
     }
 
     return (

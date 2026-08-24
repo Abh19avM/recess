@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useWebSocket } from '../hooks/useWebSocket'
 import { useAuthStore } from '../store/authStore'
@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   Wifi,
   WifiOff,
+  Grid,
 } from 'lucide-react'
 import confetti from 'canvas-confetti'
 
@@ -54,6 +55,22 @@ interface DotsBoxesGameState {
   version: number
 }
 
+interface GridPreset {
+  size: number
+  name: string
+  tag: string
+  boxes: number
+  dots: string
+  desc: string
+}
+
+const GRID_PRESETS: GridPreset[] = [
+  { size: 3, name: '3×3 Pocket', tag: 'QUICK', boxes: 9, dots: '4×4 Dots', desc: 'Fast 2-min classroom skirmish' },
+  { size: 4, name: '4×4 Classic', tag: 'STANDARD', boxes: 16, dots: '5×5 Dots', desc: 'Balanced notebook margin battle' },
+  { size: 5, name: '5×5 Large', tag: 'TACTICAL', boxes: 25, dots: '6×6 Dots', desc: 'Deep strategic graph paper match' },
+  { size: 6, name: '6×6 Jumbo', tag: 'MASTER', boxes: 36, dots: '7×7 Dots', desc: 'Full classroom tournament grid' },
+]
+
 export const DotsBoxesArenaPage: React.FC = () => {
   const { roomId } = useParams<{ roomId?: string }>()
   const { user } = useAuthStore()
@@ -74,31 +91,48 @@ export const DotsBoxesArenaPage: React.FC = () => {
   const [gameState, setGameState] = useState<DotsBoxesGameState | null>(null)
   const [chatInput, setChatInput] = useState('')
   const [deskNotes, setDeskNotes] = useState<Array<{ sender: string; text: string; time: string }>>([])
+  const [selectedGridSize, setSelectedGridSize] = useState<number>(4)
 
   // Solo Bot Practice State
   const [isBotMode, setIsBotMode] = useState(false)
-  const [botRows] = useState(3)
-  const [botCols] = useState(3)
-  const [botHEdges, setBotHEdges] = useState<string[][]>([
-    ['', '', ''],
-    ['', '', ''],
-    ['', '', ''],
-    ['', '', ''],
-  ])
-  const [botVEdges, setBotVEdges] = useState<string[][]>([
-    ['', '', '', ''],
-    ['', '', '', ''],
-    ['', '', '', ''],
-  ])
-  const [botBoxes, setBotBoxes] = useState<string[][]>([
-    ['', '', ''],
-    ['', '', ''],
-    ['', '', ''],
-  ])
+  const [botRows, setBotRows] = useState(4)
+  const [botCols, setBotCols] = useState(4)
+  const [botHEdges, setBotHEdges] = useState<string[][]>(() =>
+    Array.from({ length: 5 }, () => Array(4).fill(''))
+  )
+  const [botVEdges, setBotVEdges] = useState<string[][]>(() =>
+    Array.from({ length: 4 }, () => Array(5).fill(''))
+  )
+  const [botBoxes, setBotBoxes] = useState<string[][]>(() =>
+    Array.from({ length: 4 }, () => Array(4).fill(''))
+  )
   const [botTurn, setBotTurn] = useState<'player' | 'bot'>('player')
   const [botPlayerScore, setBotPlayerScore] = useState(0)
   const [botScore, setBotScore] = useState(0)
   const [botWinnerMsg, setBotWinnerMsg] = useState<string | null>(null)
+
+  const resetBotGameForSize = useCallback((size: number) => {
+    setBotRows(size)
+    setBotCols(size)
+    setBotHEdges(Array.from({ length: size + 1 }, () => Array(size).fill('')))
+    setBotVEdges(Array.from({ length: size }, () => Array(size + 1).fill('')))
+    setBotBoxes(Array.from({ length: size }, () => Array(size).fill('')))
+    setBotPlayerScore(0)
+    setBotScore(0)
+    setBotTurn('player')
+    setBotWinnerMsg(null)
+  }, [])
+
+  const handleSelectGridSize = (size: number) => {
+    setSelectedGridSize(size)
+    if (isBotMode) {
+      resetBotGameForSize(size)
+      toast.success(`Grid Updated to ${size}×${size}`, `${size * size} boxes ready to conquer!`)
+    } else {
+      sendEvent('game.config', { rows: size, cols: size })
+      toast.info(`Grid Dimension Requested: ${size}×${size}`, 'Will be used for the next match round.')
+    }
+  }
 
   // Listen to WebSocket game.state updates
   useEffect(() => {
@@ -107,6 +141,10 @@ export const DotsBoxesArenaPage: React.FC = () => {
       if (latest.type === 'game.state' && latest.payload) {
         const state = latest.payload as DotsBoxesGameState
         setGameState(state)
+
+        if (state.board_state?.rows) {
+          setSelectedGridSize(state.board_state.rows)
+        }
 
         if (state.status === 'finished' && state.result?.winner_id === user?.id) {
           confetti({
@@ -162,11 +200,11 @@ export const DotsBoxesArenaPage: React.FC = () => {
 
   const handleRematch = () => {
     if (isBotMode) {
-      resetBotGame()
+      resetBotGameForSize(selectedGridSize)
       return
     }
-    sendEvent('game.rematch', {})
-    toast.success('Rematch Requested', 'Starting a fresh grid match!')
+    sendEvent('game.rematch', { config: { rows: selectedGridSize, cols: selectedGridSize } })
+    toast.success('Rematch Requested', `Starting a fresh ${selectedGridSize}×${selectedGridSize} grid match!`)
   }
 
   const handleSendNote = (e: React.FormEvent) => {
@@ -231,7 +269,6 @@ export const DotsBoxesArenaPage: React.FC = () => {
     bScore: number
   ) => {
     setTimeout(() => {
-      // 1. Check if bot can complete any box immediately (greedy choice)
       const openEdges: Array<{ type: 'h' | 'v'; row: number; col: number }> = []
 
       for (let r = 0; r <= botRows; r++) {
@@ -282,12 +319,11 @@ export const DotsBoxesArenaPage: React.FC = () => {
       }
 
       if (botClosed > 0) {
-        // Bot gets bonus turn!
         triggerBotMove(nextH, nextV, nextB, pScore, nextBotScore)
       } else {
         setBotTurn('player')
       }
-    }, 500)
+    }, 450)
   }
 
   const finishBotGame = (pScore: number, bScore: number) => {
@@ -301,33 +337,10 @@ export const DotsBoxesArenaPage: React.FC = () => {
     }
   }
 
-  const resetBotGame = () => {
-    setBotHEdges([
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', ''],
-    ])
-    setBotVEdges([
-      ['', '', '', ''],
-      ['', '', '', ''],
-      ['', '', '', ''],
-    ])
-    setBotBoxes([
-      ['', '', ''],
-      ['', '', ''],
-      ['', '', ''],
-    ])
-    setBotPlayerScore(0)
-    setBotScore(0)
-    setBotTurn('player')
-    setBotWinnerMsg(null)
-  }
-
   // Active Board Data
   const board = gameState?.board_state
-  const rows = isBotMode ? botRows : board?.rows || 3
-  const cols = isBotMode ? botCols : board?.cols || 3
+  const rows = isBotMode ? botRows : board?.rows || selectedGridSize
+  const cols = isBotMode ? botCols : board?.cols || selectedGridSize
   const hEdges = isBotMode ? botHEdges : board?.horizontal_edges || []
   const vEdges = isBotMode ? botVEdges : board?.vertical_edges || []
   const boxes = isBotMode ? botBoxes : board?.boxes || []
@@ -339,10 +352,47 @@ export const DotsBoxesArenaPage: React.FC = () => {
   const myScore = isBotMode ? botPlayerScore : (user && board?.scores?.[user.id]) || 0
   const oppScore = isBotMode ? botScore : (otherMember && board?.scores?.[otherMember.user_id]) || 0
 
+  // Adaptive Sizing depending on grid density
+  const getDimensionStyles = (dimension: number) => {
+    if (dimension >= 6) {
+      return {
+        box: 'w-10 sm:w-12 h-10 sm:h-12 text-xl sm:text-2xl',
+        hEdge: 'h-2 w-10 sm:w-12',
+        vEdge: 'w-2 h-10 sm:h-12',
+        dot: 'w-2.5 h-2.5',
+      }
+    }
+    if (dimension === 5) {
+      return {
+        box: 'w-12 sm:w-14 h-12 sm:h-14 text-2xl sm:text-3xl',
+        hEdge: 'h-2.5 w-12 sm:w-14',
+        vEdge: 'w-2.5 h-12 sm:h-14',
+        dot: 'w-3 h-3',
+      }
+    }
+    if (dimension === 4) {
+      return {
+        box: 'w-14 sm:w-16 h-14 sm:h-16 text-3xl sm:text-4xl',
+        hEdge: 'h-2.5 w-14 sm:w-16',
+        vEdge: 'w-2.5 h-14 sm:h-16',
+        dot: 'w-3.5 h-3.5',
+      }
+    }
+    // 3x3
+    return {
+      box: 'w-16 sm:w-20 h-16 sm:h-20 text-3xl sm:text-4xl',
+      hEdge: 'h-2.5 w-16 sm:w-20',
+      vEdge: 'w-2.5 h-16 sm:h-20',
+      dot: 'w-3.5 h-3.5',
+    }
+  }
+
+  const dim = getDimensionStyles(cols)
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-16">
       {/* 1. Header Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] dark:border-[#334155] pb-4">
         <div className="flex items-center gap-3">
           <Link to="/games">
             <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
@@ -351,11 +401,11 @@ export const DotsBoxesArenaPage: React.FC = () => {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-extrabold text-[#1E242B]">Dots & Boxes Arena</h1>
+              <h1 className="text-2xl font-extrabold text-[#1E242B] dark:text-[#F8FAFC]">Dots & Boxes Arena</h1>
               <Stamp tone="blue">NOTEBOOK GRAPH</Stamp>
             </div>
-            <p className="font-hand text-sm text-[#475569]">
-              Room: <span className="font-mono font-bold text-[#1A365D]">{targetRoom}</span> • {rows}x{cols} Grid • Close Boxes for Bonus Turns!
+            <p className="font-hand text-sm text-[#475569] dark:text-[#94A3B8]">
+              Room: <span className="font-mono font-bold text-[#1A365D] dark:text-[#60A5FA]">{targetRoom}</span> • {rows}×{cols} Grid ({rows * cols} Boxes) • Close Boxes for Bonus Turns!
             </p>
           </div>
         </div>
@@ -365,7 +415,7 @@ export const DotsBoxesArenaPage: React.FC = () => {
           <Button
             onClick={() => {
               setIsBotMode(!isBotMode)
-              if (!isBotMode) resetBotGame()
+              if (!isBotMode) resetBotGameForSize(selectedGridSize)
             }}
             variant={isBotMode ? 'primary' : 'secondary'}
             size="sm"
@@ -377,11 +427,11 @@ export const DotsBoxesArenaPage: React.FC = () => {
           {!isBotMode && (
             <div className="flex items-center gap-1 text-xs font-mono">
               {status === 'OPEN' ? (
-                <span className="flex items-center gap-1 text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded border border-[#86EFAC]">
+                <span className="flex items-center gap-1 text-[#15803D] dark:text-[#86EFAC] bg-[#DCFCE7] dark:bg-[#063323] px-2 py-1 rounded border border-[#86EFAC] dark:border-[#065F46]">
                   <Wifi className="w-3.5 h-3.5" /> LIVE
                 </span>
               ) : (
-                <span className="flex items-center gap-1 text-[#991B1B] bg-[#FFE4E6] px-2 py-1 rounded border border-[#FECDD3]">
+                <span className="flex items-center gap-1 text-[#991B1B] dark:text-[#FCA5A5] bg-[#FFE4E6] dark:bg-[#3B1123] px-2 py-1 rounded border border-[#FECDD3] dark:border-[#9D174D]">
                   <WifiOff className="w-3.5 h-3.5" /> OFFLINE
                 </span>
               )}
@@ -390,6 +440,40 @@ export const DotsBoxesArenaPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Grid Size Selection Toolbar */}
+      <PaperCard variant="plain" className="p-3.5 flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <Grid className="w-4 h-4 text-[#1A365D] dark:text-[#60A5FA]" />
+          <span className="text-xs font-bold font-mono uppercase tracking-wider text-[#1E242B] dark:text-[#F8FAFC]">
+            Grid Dimension:
+          </span>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 flex-1 max-w-2xl">
+          {GRID_PRESETS.map((preset) => {
+            const isSelected = selectedGridSize === preset.size
+            return (
+              <button
+                key={preset.size}
+                type="button"
+                onClick={() => handleSelectGridSize(preset.size)}
+                className={`px-3 py-2 rounded-lg border-2 text-left transition-all cursor-pointer ${
+                  isSelected
+                    ? 'border-[#1A365D] dark:border-[#38BDF8] bg-[#E0F2FE] dark:bg-[#0B2545] shadow-[2px_2px_0px_0px_#1A365D] dark:shadow-[2px_2px_0px_0px_#020617]'
+                    : 'border-[#CBD5E1] dark:border-[#334155] bg-white dark:bg-[#141C2E] hover:bg-slate-50 dark:hover:bg-[#1E293B]'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-xs text-[#1E242B] dark:text-[#F8FAFC]">{preset.name}</span>
+                  <span className="text-[9px] font-mono font-semibold text-[#15803D] dark:text-[#86EFAC]">{preset.boxes} B</span>
+                </div>
+                <p className="text-[10px] text-[#475569] dark:text-[#94A3B8] font-hand leading-tight mt-0.5 truncate">{preset.desc}</p>
+              </button>
+            )
+          })}
+        </div>
+      </PaperCard>
+
       {/* 2. Main Arena Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left: Interactive Graph Board (7 cols) */}
@@ -397,7 +481,7 @@ export const DotsBoxesArenaPage: React.FC = () => {
           {/* Turn Banner */}
           <PaperCard variant="sticky" stickyColor="blue" showTape className="p-3 text-center">
             {isBotMode ? (
-              <div className="font-hand text-lg font-bold text-[#1A365D]">
+              <div className="font-hand text-lg font-bold text-[#1A365D] dark:text-[#93C5FD]">
                 {botWinnerMsg
                   ? botWinnerMsg
                   : botTurn === 'player'
@@ -406,13 +490,13 @@ export const DotsBoxesArenaPage: React.FC = () => {
               </div>
             ) : gameState?.status === 'active' ? (
               <div className="flex items-center justify-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] animate-ping" />
-                <span className="font-hand text-xl font-bold text-[#1A365D]">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] dark:bg-[#4ADE80] animate-ping" />
+                <span className="font-hand text-xl font-bold text-[#1A365D] dark:text-[#93C5FD]">
                   {isMyTurn ? '✎ Your Turn! Draw a pencil line.' : `⏳ Waiting for @${otherMember?.username || 'Opponent'}...`}
                 </span>
               </div>
             ) : gameState?.status === 'finished' ? (
-              <div className="font-hand text-xl font-bold text-[#991B1B]">
+              <div className="font-hand text-xl font-bold text-[#991B1B] dark:text-[#F87171]">
                 {gameState.result?.is_draw
                   ? '🤝 Match Ended in a Draw (Equal Boxes Claimed)!'
                   : gameState.result?.winner_id === user?.id
@@ -420,7 +504,7 @@ export const DotsBoxesArenaPage: React.FC = () => {
                   : '✎ Match Concluded. Better luck next period!'}
               </div>
             ) : (
-              <div className="font-hand text-base text-[#475569]">
+              <div className="font-hand text-base text-[#475569] dark:text-[#94A3B8]">
                 {members.length < 2
                   ? `Invite a classmate to join code "${targetRoom}"`
                   : 'Both players must toggle "Ready Up" to start.'}
@@ -429,16 +513,16 @@ export const DotsBoxesArenaPage: React.FC = () => {
           </PaperCard>
 
           {/* Graph Paper Dots Arena */}
-          <PaperCard variant="graph" className="p-6 sm:p-8 flex flex-col items-center justify-center relative select-none">
+          <PaperCard variant="graph" className="p-4 sm:p-6 flex flex-col items-center justify-center relative select-none overflow-x-auto">
             {/* Score Tracker Bar */}
-            <div className="flex items-center justify-between w-full max-w-sm mb-6 px-4 py-2 rounded-lg bg-white/90 border border-[#CBD5E1] shadow-2xs font-mono font-bold text-sm">
-              <span className="text-[#1A365D]">You: {myScore} Boxes</span>
-              <span className="text-[#475569]">vs</span>
-              <span className="text-[#991B1B]">Opponent: {oppScore} Boxes</span>
+            <div className="flex items-center justify-between w-full max-w-md mb-5 px-4 py-2 rounded-lg bg-white/90 dark:bg-[#101726]/90 border border-[#CBD5E1] dark:border-[#334155] shadow-2xs font-mono font-bold text-sm">
+              <span className="text-[#1A365D] dark:text-[#60A5FA]">You: {myScore} Boxes</span>
+              <span className="text-xs text-[#475569] dark:text-[#94A3B8]">Total {rows * cols}</span>
+              <span className="text-[#991B1B] dark:text-[#F87171]">Opponent: {oppScore} Boxes</span>
             </div>
 
             {/* Dots Grid Canvas */}
-            <div className="relative inline-block p-4">
+            <div className="relative inline-block p-2 sm:p-4 bg-white/50 dark:bg-[#0B0F19]/60 rounded-xl border border-[#E2E8F0] dark:border-[#1E293B]">
               {Array.from({ length: rows }).map((_, r) => (
                 <div key={r} className="flex flex-col">
                   {/* Row of Dots and Horizontal Edges */}
@@ -449,25 +533,25 @@ export const DotsBoxesArenaPage: React.FC = () => {
                       return (
                         <React.Fragment key={`h-${r}-${c}`}>
                           {/* Dot */}
-                          <div className="w-3.5 h-3.5 rounded-full bg-[#1E242B] border-2 border-white shadow-xs z-10" />
+                          <div className={`${dim.dot} rounded-full bg-[#1E242B] dark:bg-[#F8FAFC] border-2 border-white dark:border-[#334155] shadow-xs z-10`} />
 
                           {/* Horizontal Edge Button */}
                           <button
                             onClick={() => handleDrawEdge('h', r, c)}
                             disabled={!!isClaimed || (!isBotMode && gameState?.status !== 'active') || (isBotMode && !!botWinnerMsg)}
-                            className={`h-2.5 w-16 sm:w-20 transition-all rounded-xs cursor-pointer ${
+                            className={`${dim.hEdge} transition-all rounded-xs cursor-pointer ${
                               isClaimed
                                 ? isPlayer
-                                  ? 'bg-[#1A365D] shadow-[0_1px_2px_rgba(26,54,93,0.4)]'
-                                  : 'bg-[#991B1B] shadow-[0_1px_2px_rgba(153,27,27,0.4)]'
-                                : 'bg-[#E2E8F0] hover:bg-[#94A3B8]/60 active:scale-95'
+                                  ? 'bg-[#1A365D] dark:bg-[#38BDF8] shadow-[0_1px_3px_rgba(26,54,93,0.4)] dark:shadow-[0_0_8px_rgba(56,189,248,0.5)]'
+                                  : 'bg-[#991B1B] dark:bg-[#F87171] shadow-[0_1px_3px_rgba(153,27,27,0.4)] dark:shadow-[0_0_8px_rgba(248,113,113,0.5)]'
+                                : 'bg-[#E2E8F0] dark:bg-[#334155] hover:bg-[#94A3B8]/80 dark:hover:bg-[#60A5FA]/60 active:scale-95'
                             }`}
                           />
                         </React.Fragment>
                       )
                     })}
                     {/* Last dot in row */}
-                    <div className="w-3.5 h-3.5 rounded-full bg-[#1E242B] border-2 border-white shadow-xs z-10" />
+                    <div className={`${dim.dot} rounded-full bg-[#1E242B] dark:bg-[#F8FAFC] border-2 border-white dark:border-[#334155] shadow-xs z-10`} />
                   </div>
 
                   {/* Vertical Edges and Box Centers */}
@@ -484,27 +568,27 @@ export const DotsBoxesArenaPage: React.FC = () => {
                           <button
                             onClick={() => handleDrawEdge('v', r, c)}
                             disabled={!!vLeft || (!isBotMode && gameState?.status !== 'active') || (isBotMode && !!botWinnerMsg)}
-                            className={`w-2.5 h-16 sm:h-20 transition-all rounded-xs cursor-pointer ${
+                            className={`${dim.vEdge} transition-all rounded-xs cursor-pointer ${
                               vLeft
                                 ? isVLeftPlayer
-                                  ? 'bg-[#1A365D] shadow-[1px_0_2px_rgba(26,54,93,0.4)]'
-                                  : 'bg-[#991B1B] shadow-[1px_0_2px_rgba(153,27,27,0.4)]'
-                                : 'bg-[#E2E8F0] hover:bg-[#94A3B8]/60 active:scale-95'
+                                  ? 'bg-[#1A365D] dark:bg-[#38BDF8] shadow-[1px_0_3px_rgba(26,54,93,0.4)] dark:shadow-[0_0_8px_rgba(56,189,248,0.5)]'
+                                  : 'bg-[#991B1B] dark:bg-[#F87171] shadow-[1px_0_3px_rgba(153,27,27,0.4)] dark:shadow-[0_0_8px_rgba(248,113,113,0.5)]'
+                                : 'bg-[#E2E8F0] dark:bg-[#334155] hover:bg-[#94A3B8]/80 dark:hover:bg-[#60A5FA]/60 active:scale-95'
                             }`}
                           />
 
                           {/* Box Inner Area */}
                           <div
-                            className={`w-16 sm:w-20 h-16 sm:h-20 flex items-center justify-center font-hand text-3xl sm:text-4xl font-bold transition-all duration-200 ${
+                            className={`${dim.box} flex items-center justify-center font-hand font-bold transition-all duration-200 ${
                               boxOwner
                                 ? isBoxPlayer
-                                  ? 'bg-[#E0F2FE]/80 text-[#1A365D] animate-in zoom-in-75'
-                                  : 'bg-[#FFE4E6]/80 text-[#991B1B] animate-in zoom-in-75'
+                                  ? 'bg-[#E0F2FE]/80 dark:bg-[#0B2545]/80 text-[#1A365D] dark:text-[#38BDF8] animate-in zoom-in-75'
+                                  : 'bg-[#FFE4E6]/80 dark:bg-[#3B1123]/80 text-[#991B1B] dark:text-[#F87171] animate-in zoom-in-75'
                                 : 'bg-transparent'
                             }`}
                           >
                             {boxOwner && (
-                              <span className="drop-shadow-xs">
+                              <span className="drop-shadow-xs select-none">
                                 {isBoxPlayer ? (user?.username?.[0]?.toUpperCase() || 'A') : (otherMember?.username?.[0]?.toUpperCase() || 'B')}
                               </span>
                             )}
@@ -521,12 +605,12 @@ export const DotsBoxesArenaPage: React.FC = () => {
                         <button
                           onClick={() => handleDrawEdge('v', r, cols)}
                           disabled={!!vRight || (!isBotMode && gameState?.status !== 'active') || (isBotMode && !!botWinnerMsg)}
-                          className={`w-2.5 h-16 sm:h-20 transition-all rounded-xs cursor-pointer ${
+                          className={`${dim.vEdge} transition-all rounded-xs cursor-pointer ${
                             vRight
                               ? isVRightPlayer
-                                ? 'bg-[#1A365D] shadow-[1px_0_2px_rgba(26,54,93,0.4)]'
-                                : 'bg-[#991B1B] shadow-[1px_0_2px_rgba(153,27,27,0.4)]'
-                              : 'bg-[#E2E8F0] hover:bg-[#94A3B8]/60 active:scale-95'
+                                ? 'bg-[#1A365D] dark:bg-[#38BDF8] shadow-[1px_0_3px_rgba(26,54,93,0.4)] dark:shadow-[0_0_8px_rgba(56,189,248,0.5)]'
+                                : 'bg-[#991B1B] dark:bg-[#F87171] shadow-[1px_0_3px_rgba(153,27,27,0.4)] dark:shadow-[0_0_8px_rgba(248,113,113,0.5)]'
+                              : 'bg-[#E2E8F0] dark:bg-[#334155] hover:bg-[#94A3B8]/80 dark:hover:bg-[#60A5FA]/60 active:scale-95'
                           }`}
                         />
                       )
@@ -542,22 +626,22 @@ export const DotsBoxesArenaPage: React.FC = () => {
                   const isPlayer = isClaimed === (isBotMode ? 'player' : user?.id)
                   return (
                     <React.Fragment key={`bottom-h-${c}`}>
-                      <div className="w-3.5 h-3.5 rounded-full bg-[#1E242B] border-2 border-white shadow-xs z-10" />
+                      <div className={`${dim.dot} rounded-full bg-[#1E242B] dark:bg-[#F8FAFC] border-2 border-white dark:border-[#334155] shadow-xs z-10`} />
                       <button
                         onClick={() => handleDrawEdge('h', rows, c)}
                         disabled={!!isClaimed || (!isBotMode && gameState?.status !== 'active') || (isBotMode && !!botWinnerMsg)}
-                        className={`h-2.5 w-16 sm:w-20 transition-all rounded-xs cursor-pointer ${
+                        className={`${dim.hEdge} transition-all rounded-xs cursor-pointer ${
                           isClaimed
                             ? isPlayer
-                              ? 'bg-[#1A365D] shadow-[0_1px_2px_rgba(26,54,93,0.4)]'
-                              : 'bg-[#991B1B] shadow-[0_1px_2px_rgba(153,27,27,0.4)]'
-                            : 'bg-[#E2E8F0] hover:bg-[#94A3B8]/60 active:scale-95'
+                              ? 'bg-[#1A365D] dark:bg-[#38BDF8] shadow-[0_1px_3px_rgba(26,54,93,0.4)] dark:shadow-[0_0_8px_rgba(56,189,248,0.5)]'
+                              : 'bg-[#991B1B] dark:bg-[#F87171] shadow-[0_1px_3px_rgba(153,27,27,0.4)] dark:shadow-[0_0_8px_rgba(248,113,113,0.5)]'
+                            : 'bg-[#E2E8F0] dark:bg-[#334155] hover:bg-[#94A3B8]/80 dark:hover:bg-[#60A5FA]/60 active:scale-95'
                         }`}
                       />
                     </React.Fragment>
                   )
                 })}
-                <div className="w-3.5 h-3.5 rounded-full bg-[#1E242B] border-2 border-white shadow-xs z-10" />
+                <div className={`${dim.dot} rounded-full bg-[#1E242B] dark:bg-[#F8FAFC] border-2 border-white dark:border-[#334155] shadow-xs z-10`} />
               </div>
             </div>
 
@@ -572,7 +656,7 @@ export const DotsBoxesArenaPage: React.FC = () => {
                     className="w-full"
                     leftIcon={<RotateCcw className="w-4 h-4" />}
                   >
-                    Play Rematch Round
+                    Play Rematch ({selectedGridSize}×{selectedGridSize})
                   </Button>
                 ) : (
                   <Button
@@ -586,13 +670,13 @@ export const DotsBoxesArenaPage: React.FC = () => {
                 )
               ) : (
                 <Button
-                  onClick={resetBotGame}
+                  onClick={() => resetBotGameForSize(selectedGridSize)}
                   variant="secondary"
                   size="md"
                   className="w-full"
                   leftIcon={<RotateCcw className="w-4 h-4" />}
                 >
-                  Restart Practice
+                  Restart Practice ({selectedGridSize}×{selectedGridSize})
                 </Button>
               )}
             </div>
@@ -603,24 +687,24 @@ export const DotsBoxesArenaPage: React.FC = () => {
         <div className="lg:col-span-5 space-y-4">
           {/* Players Roster */}
           <PaperCard variant="ruled" className="p-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#CBD5E1] mb-3">
+            <div className="flex items-center justify-between pb-3 border-b border-[#CBD5E1] dark:border-[#334155] mb-3">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-[#1A365D]" />
-                <h3 className="font-bold text-sm text-[#1E242B]">Classroom Bench</h3>
+                <Users className="w-4 h-4 text-[#1A365D] dark:text-[#60A5FA]" />
+                <h3 className="font-bold text-sm text-[#1E242B] dark:text-[#F8FAFC]">Classroom Bench</h3>
               </div>
               <Stamp tone="blue">{members.length}/2 SEATED</Stamp>
             </div>
 
             <div className="space-y-3">
               {/* Player 1 (You) */}
-              <div className="flex items-center justify-between p-2.5 rounded bg-white border border-[#CBD5E1] shadow-2xs">
+              <div className="flex items-center justify-between p-2.5 rounded bg-white dark:bg-[#101726] border border-[#CBD5E1] dark:border-[#334155] shadow-2xs">
                 <div className="flex items-center gap-2.5">
                   <Avatar username={user?.username || 'You'} size="sm" isOnline />
                   <div>
-                    <p className="text-xs font-bold text-[#1E242B]">
-                      @{user?.username || 'You'} <span className="text-[#1A365D]">(You)</span>
+                    <p className="text-xs font-bold text-[#1E242B] dark:text-[#F8FAFC]">
+                      @{user?.username || 'You'} <span className="text-[#1A365D] dark:text-[#60A5FA]">(You)</span>
                     </p>
-                    <span className="font-hand text-sm text-[#1A365D] font-bold">
+                    <span className="font-hand text-sm text-[#1A365D] dark:text-[#60A5FA] font-bold">
                       Lines: Navy Pencil • Score: {myScore}
                     </span>
                   </div>
@@ -631,7 +715,7 @@ export const DotsBoxesArenaPage: React.FC = () => {
               </div>
 
               {/* Player 2 (Opponent) */}
-              <div className="flex items-center justify-between p-2.5 rounded bg-white border border-[#CBD5E1] shadow-2xs">
+              <div className="flex items-center justify-between p-2.5 rounded bg-white dark:bg-[#101726] border border-[#CBD5E1] dark:border-[#334155] shadow-2xs">
                 <div className="flex items-center gap-2.5">
                   <Avatar
                     username={otherMember?.username || (isBotMode ? 'ClassBot' : 'Waiting...')}
@@ -639,10 +723,10 @@ export const DotsBoxesArenaPage: React.FC = () => {
                     isOnline={!!otherMember || isBotMode}
                   />
                   <div>
-                    <p className="text-xs font-bold text-[#1E242B]">
+                    <p className="text-xs font-bold text-[#1E242B] dark:text-[#F8FAFC]">
                       {isBotMode ? 'ClassBot (AI)' : otherMember ? `@${otherMember.username}` : 'Empty Desk...'}
                     </p>
-                    <span className="font-hand text-sm text-[#991B1B] font-bold">
+                    <span className="font-hand text-sm text-[#991B1B] dark:text-[#F87171] font-bold">
                       Lines: Red Pen • Score: {oppScore}
                     </span>
                   </div>
@@ -656,37 +740,37 @@ export const DotsBoxesArenaPage: React.FC = () => {
 
           {/* Desk Notes Chat */}
           <PaperCard variant="plain" className="p-4 flex flex-col h-64">
-            <h4 className="font-bold text-xs uppercase tracking-wider text-[#1E242B] font-mono mb-2 pb-1 border-b border-[#CBD5E1]">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-[#1E242B] dark:text-[#F8FAFC] font-mono mb-2 pb-1 border-b border-[#CBD5E1] dark:border-[#334155]">
               Pass Desk Notes:
             </h4>
 
             {/* Note log */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
               {deskNotes.length === 0 ? (
-                <p className="text-[#94A3B8] font-hand text-sm text-center py-6">
+                <p className="text-[#94A3B8] dark:text-[#64748B] font-hand text-sm text-center py-6">
                   No notes passed yet. Whisper something to your benchmate!
                 </p>
               ) : (
                 deskNotes.map((note, idx) => (
-                  <div key={idx} className="bg-[#FEF9C3] p-2 rounded border border-[#FDE047] text-left">
-                    <div className="flex items-center justify-between text-[10px] text-[#854D0E] font-mono font-bold">
+                  <div key={idx} className="bg-[#FEF9C3] dark:bg-[#2D2106] p-2 rounded border border-[#FDE047] dark:border-[#854D0E] text-left">
+                    <div className="flex items-center justify-between text-[10px] text-[#854D0E] dark:text-[#FEF08A] font-mono font-bold">
                       <span>@{note.sender}</span>
                       <span>{note.time}</span>
                     </div>
-                    <p className="font-hand text-sm text-[#1E242B] mt-0.5">{note.text}</p>
+                    <p className="font-hand text-sm text-[#1E242B] dark:text-[#F8FAFC] mt-0.5">{note.text}</p>
                   </div>
                 ))
               )}
             </div>
 
             {/* Note Input */}
-            <form onSubmit={handleSendNote} className="flex gap-2 pt-2 mt-2 border-t border-[#CBD5E1]">
+            <form onSubmit={handleSendNote} className="flex gap-2 pt-2 mt-2 border-t border-[#CBD5E1] dark:border-[#334155]">
               <input
                 type="text"
                 placeholder="Whisper a quick note..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                className="flex-1 px-2.5 py-1.5 text-xs bg-white rounded border border-[#94A3B8] outline-none"
+                className="flex-1 px-2.5 py-1.5 text-xs bg-white dark:bg-[#101726] rounded border border-[#94A3B8] dark:border-[#475569] text-[#1E242B] dark:text-[#F8FAFC] outline-none"
               />
               <Button type="submit" variant="primary" size="sm">
                 <Send className="w-3.5 h-3.5" />

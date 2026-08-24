@@ -30,6 +30,7 @@ const (
 	EventGameMove    EventType = "game.move"
 	EventGameState   EventType = "game.state"
 	EventGameRematch EventType = "game.rematch"
+	EventGameConfig  EventType = "game.config"
 
 	// Session Reconnection Events
 	EventSessionReconnect   EventType = "session.reconnect"

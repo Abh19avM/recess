@@ -74,6 +74,7 @@ type Hub struct {
 	roomSeq              map[string]int64                 // roomID -> sequence counter
 	roomEngines          map[string]engine.Engine         // roomID -> active GameEngine
 	roomTypes            map[string]engine.GameType       // roomID -> designated GameType
+	roomConfigs          map[string]json.RawMessage       // roomID -> custom game configuration
 	roomHistory          map[string][]*EventEnvelope      // roomID -> ring buffer of recent events
 	roomStartTimes       map[string]time.Time             // roomID -> game start timestamp
 	disconnectedSessions map[string]*DisconnectedSession  // sessionID -> DisconnectedSession
@@ -91,6 +92,7 @@ func NewHub(opts ...HubOption) *Hub {
 		roomSeq:              make(map[string]int64),
 		roomEngines:          make(map[string]engine.Engine),
 		roomTypes:            make(map[string]engine.GameType),
+		roomConfigs:          make(map[string]json.RawMessage),
 		roomHistory:          make(map[string][]*EventEnvelope),
 		roomStartTimes:       make(map[string]time.Time),
 		disconnectedSessions: make(map[string]*DisconnectedSession),
@@ -577,7 +579,8 @@ func (h *Hub) StartGame(roomID string, gameType engine.GameType) {
 		return
 	}
 
-	state, err := eng.Initialize(roomID, players, nil)
+	cfg := h.roomConfigs[roomID]
+	state, err := eng.Initialize(roomID, players, cfg)
 	if err != nil {
 		h.mu.Unlock()
 		slog.Error("failed to initialize game engine", "room_id", roomID, "error", err)
@@ -892,11 +895,27 @@ func (h *Hub) HandleMessage(c *Client, env *EventEnvelope) {
 		}
 		h.ToggleReady(c, !c.GetReady())
 
+	case EventGameConfig:
+		roomID := env.RoomID
+		if roomID != "" && len(env.Payload) > 0 {
+			h.mu.Lock()
+			h.roomConfigs[roomID] = env.Payload
+			h.mu.Unlock()
+			configEnv, _ := NewEnvelope(EventGameConfig, roomID, h.nextSeq(roomID), env.Payload)
+			h.BroadcastToRoom(roomID, configEnv, "")
+		}
+
 	case EventGameStart:
 		var startPayload struct {
-			GameType string `json:"game_type"`
+			GameType string          `json:"game_type"`
+			Config   json.RawMessage `json:"config,omitempty"`
 		}
 		_ = json.Unmarshal(env.Payload, &startPayload)
+		if len(startPayload.Config) > 0 {
+			h.mu.Lock()
+			h.roomConfigs[env.RoomID] = startPayload.Config
+			h.mu.Unlock()
+		}
 		gType := engine.GameType(startPayload.GameType)
 		h.StartGame(env.RoomID, gType)
 
@@ -904,6 +923,16 @@ func (h *Hub) HandleMessage(c *Client, env *EventEnvelope) {
 		h.HandleGameMove(c, env)
 
 	case EventGameRematch:
+		if len(env.Payload) > 0 {
+			var rematchPayload struct {
+				Config json.RawMessage `json:"config,omitempty"`
+			}
+			if err := json.Unmarshal(env.Payload, &rematchPayload); err == nil && len(rematchPayload.Config) > 0 {
+				h.mu.Lock()
+				h.roomConfigs[env.RoomID] = rematchPayload.Config
+				h.mu.Unlock()
+			}
+		}
 		h.HandleRematch(c, env)
 
 	case EventSessionReconnect:

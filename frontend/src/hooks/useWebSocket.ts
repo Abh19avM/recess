@@ -64,8 +64,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     // Determine host and protocol
     const isSecure = window.location.protocol === 'https:'
     const protocol = isSecure ? 'wss:' : 'ws:'
-    const host = window.location.host
-    let wsUrl = `${protocol}//${host}/ws`
+    const isDev = window.location.port === '5173'
+    const targetHost = isDev ? `${window.location.hostname}:8080` : window.location.host
+    let wsUrl = `${protocol}//${targetHost}/ws`
 
     // Add query params
     const params = new URLSearchParams()
@@ -218,11 +219,16 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
             case 'room.state': {
               const payload = envelope.payload as { room_id: string; members: PlayerInfo[]; spectator_count?: number }
               setCurrentRoom(payload.room_id)
-              setMembers(payload.members || [])
+              const rawMembers = payload.members || []
+              const uniqueMap = new Map<string, PlayerInfo>()
+              rawMembers.forEach((m) => {
+                if (m && m.user_id) uniqueMap.set(m.user_id, m)
+              })
+              setMembers(Array.from(uniqueMap.values()))
               if (payload.spectator_count !== undefined) {
                 setSpectatorCount(payload.spectator_count)
               }
-              const me = (payload.members || []).find((m) => m.user_id === user?.id || m.username === user?.username)
+              const me = rawMembers.find((m) => m.user_id === user?.id || m.username === user?.username)
               if (me) {
                 setIsReady(me.is_ready)
               }
@@ -316,8 +322,9 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
       }
 
       ws.onerror = (err) => {
-        console.error('WebSocket encountered an error:', err)
-        ws.close()
+        if (shouldReconnectRef.current) {
+          console.warn('WebSocket reconnect pending...', err)
+        }
       }
     } catch (err) {
       console.error('Failed to instantiate WebSocket:', err)
@@ -340,7 +347,13 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
         clearInterval(pingIntervalRef.current)
       }
       if (socketRef.current) {
-        socketRef.current.close()
+        const ws = socketRef.current
+        socketRef.current = null
+        if (ws.readyState === WebSocket.OPEN) {
+          ws.close(1000, 'Component unmounted')
+        } else if (ws.readyState === WebSocket.CONNECTING) {
+          ws.onopen = () => ws.close(1000, 'Component unmounted')
+        }
       }
     }
   }, [autoConnect, connect])

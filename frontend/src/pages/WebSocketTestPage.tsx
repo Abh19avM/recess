@@ -323,11 +323,11 @@ export const WebSocketTestPage: React.FC = () => {
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {members.map((member) => {
+                {members.map((member, idx) => {
                   const isMe = member.user_id === user?.id || member.username === user?.username
                   return (
                     <div
-                      key={member.user_id}
+                      key={`${member.user_id || member.username}_${idx}`}
                       className={`p-3 rounded-md border-2 transition-all flex items-center justify-between ${
                         isMe
                           ? 'bg-[#F0FDF4] border-[#15803D] shadow-[2px_2px_0px_0px_#15803D]'

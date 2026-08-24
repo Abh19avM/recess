@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-hand: 'Patrick Hand', 'Caveat', cursive;
@@ -32,11 +34,20 @@
     background-color: #FBF9F3;
     color: #1E242B;
     font-family: 'Plus Jakarta Sans', sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  html.dark body {
+    background-color: #0B0F19;
+    color: #F8FAFC;
   }
 }
 
-/* Notebook & Stationery Material Utilities */
+/* ==========================================================================
+   Notebook & Stationery Material Utilities (Light & Midnight Dark)
+   ========================================================================== */
 
+/* 1. Ruled Notebook Page */
 .paper-ruled {
   background-color: #FFFFFF;
   background-image: 
@@ -46,6 +57,15 @@
   background-attachment: local;
 }
 
+.dark .paper-ruled {
+  background-color: #141C2E;
+  background-image: 
+    linear-gradient(90deg, transparent 46px, #EF4444 46px, #EF4444 48px, transparent 48px),
+    repeating-linear-gradient(transparent, transparent 27px, rgba(148, 163, 184, 0.14) 27px, rgba(148, 163, 184, 0.14) 28px);
+  color: #F8FAFC;
+}
+
+/* 2. Graph Paper Grid */
 .paper-graph {
   background-color: #FFFFFF;
   background-image: 
@@ -54,20 +74,39 @@
   background-size: 20px 20px;
 }
 
+.dark .paper-graph {
+  background-color: #141C2E;
+  background-image: 
+    linear-gradient(rgba(96, 165, 250, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(96, 165, 250, 0.14) 1px, transparent 1px);
+  color: #F8FAFC;
+}
+
+/* 3. Chalkboard Texture */
 .paper-graph-dark {
-  background-color: #18231C;
+  background-color: #0F172A;
   background-image: 
     linear-gradient(rgba(248, 250, 252, 0.08) 1px, transparent 1px),
     linear-gradient(90deg, rgba(248, 250, 252, 0.08) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
+/* 4. Bulletin Cork Board */
 .paper-cork {
   background-color: #D8B17A;
   background-image: radial-gradient(#C69E66 10%, transparent 11%), radial-gradient(#C69E66 10%, transparent 11%);
   background-size: 16px 16px;
   background-position: 0 0, 8px 8px;
 }
+
+.dark .paper-cork {
+  background-color: #1E1610;
+  background-image: radial-gradient(#120C07 12%, transparent 13%), radial-gradient(#120C07 12%, transparent 13%);
+}
+
+/* ==========================================================================
+   Rubber Teacher Stamps (Crisp Inks & Luminous Dark Inks)
+   ========================================================================== */
 
 .rubber-stamp {
   font-family: 'Patrick Hand', cursive;
@@ -88,12 +127,24 @@
   background-color: rgba(185, 28, 28, 0.06);
   transform: rotate(-2deg);
 }
+.dark .rubber-stamp-red {
+  color: #FCA5A5;
+  border-color: #EF4444;
+  background-color: rgba(239, 68, 68, 0.2);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.3);
+}
 
 .rubber-stamp-green {
   color: #15803D;
   border-color: #15803D;
   background-color: rgba(21, 128, 61, 0.06);
   transform: rotate(2deg);
+}
+.dark .rubber-stamp-green {
+  color: #86EFAC;
+  border-color: #22C55E;
+  background-color: rgba(34, 197, 94, 0.2);
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.3);
 }
 
 .rubber-stamp-blue {
@@ -102,6 +153,12 @@
   background-color: rgba(29, 78, 216, 0.06);
   transform: rotate(-1.5deg);
 }
+.dark .rubber-stamp-blue {
+  color: #93C5FD;
+  border-color: #3B82F6;
+  background-color: rgba(59, 130, 246, 0.2);
+  box-shadow: 0 0 8px rgba(59, 130, 246, 0.3);
+}
 
 .rubber-stamp-amber {
   color: #B45309;
@@ -109,20 +166,41 @@
   background-color: rgba(180, 83, 9, 0.06);
   transform: rotate(1deg);
 }
+.dark .rubber-stamp-amber {
+  color: #FDE047;
+  border-color: #EAB308;
+  background-color: rgba(234, 179, 8, 0.2);
+  box-shadow: 0 0 8px rgba(234, 179, 8, 0.3);
+}
+
+/* ==========================================================================
+   Stationery Borders & Tactile Shadows
+   ========================================================================== */
 
 .sketch-border {
   border: 1.5px solid #475569;
   box-shadow: 2px 2px 0px 0px #1E242B;
+}
+.dark .sketch-border {
+  border-color: #475569;
+  box-shadow: 2px 2px 0px 0px #020617;
 }
 
 .sketch-border-subtle {
   border: 1px solid #CBD5E1;
   box-shadow: 2px 2px 0px 0px rgba(71, 85, 105, 0.2);
 }
+.dark .sketch-border-subtle {
+  border-color: #334155;
+  box-shadow: 2px 2px 0px 0px rgba(0, 0, 0, 0.5);
+}
 
 .sketch-border-hover:hover {
   box-shadow: 4px 4px 0px 0px #1E242B;
   transform: translate(-1px, -1px);
+}
+.dark .sketch-border-hover:hover {
+  box-shadow: 4px 4px 0px 0px #020617;
 }
 
 .chalk-glow {
@@ -141,4 +219,84 @@
   background: rgba(254, 240, 138, 0.5);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(1px);
+}
+.dark .masking-tape {
+  background: rgba(254, 240, 138, 0.2);
+}
+
+/* ==========================================================================
+   Midnight Dark Mode Utility Overrides
+   ========================================================================== */
+
+html.dark header {
+  background-color: #101726;
+  border-color: #1E293B;
+}
+
+html.dark footer {
+  background-color: #0E1422;
+  border-color: #1E293B;
+  color: #94A3B8;
+}
+
+html.dark .bg-white {
+  background-color: #141C2E;
+}
+
+html.dark .bg-\[\#FBF9F3\] {
+  background-color: #0B0F19;
+}
+
+html.dark .bg-\[\#F2EDE0\] {
+  background-color: #101726;
+}
+
+html.dark .bg-\[\#FFFFFF\] {
+  background-color: #141C2E;
+}
+
+html.dark .border-\[\#1E242B\] {
+  border-color: #334155;
+}
+
+html.dark .border-\[\#CBD5E1\] {
+  border-color: #27354A;
+}
+
+html.dark .text-\[\#1E242B\] {
+  color: #F8FAFC;
+}
+
+html.dark .text-\[\#475569\] {
+  color: #94A3B8;
+}
+
+html.dark .text-\[\#1A365D\] {
+  color: #60A5FA;
+}
+
+html.dark .text-\[\#15803D\] {
+  color: #4ADE80;
+}
+
+html.dark .text-\[\#B45309\] {
+  color: #FBBF24;
+}
+
+html.dark .text-\[\#991B1B\] {
+  color: #F87171;
+}
+
+html.dark .shadow-\[3px_3px_0px_0px_\#1E242B\],
+html.dark .shadow-\[2px_2px_0px_0px_\#1E242B\],
+html.dark .shadow-\[4px_4px_0px_0px_\#1E242B\] {
+  box-shadow: 2px 2px 0px 0px #020617;
+}
+
+html.dark input, 
+html.dark select, 
+html.dark textarea {
+  background-color: #0B0F19;
+  color: #F8FAFC;
+  border-color: #334155;
 }
