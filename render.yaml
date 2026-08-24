@@ -1,0 +1,32 @@
+services:
+  # Recess Go Backend Service (Web Service with WebSocket support)
+  - type: web
+    name: recess-backend
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: PORT
+        value: 8080
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_URL
+        fromDatabase:
+          name: recess-postgres
+          property: connectionString
+      - key: REDIS_URL
+        value: redis://red-placeholder:6379
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ALLOWED_ORIGINS
+        value: "*"
+
+databases:
+  # Free Managed PostgreSQL Database
+  - name: recess-postgres
+    plan: free
+    databaseName: recess
+    user: recess_admin

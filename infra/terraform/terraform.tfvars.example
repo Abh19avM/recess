@@ -1,0 +1,20 @@
+# AWS Region & Environment
+aws_region  = "us-east-1"
+environment = "production"
+app_name    = "recess"
+
+# Custom Domain (Optional: e.g. "playrecess.com")
+domain_name = ""
+
+# Database Credentials
+db_username = "recess_admin"
+db_password = "ReplaceWithSecurePassword123!"
+
+# JWT Signing Secret (Generate with: openssl rand -base64 32)
+jwt_secret = "replace-with-a-very-long-and-secure-random-jwt-secret-key-32-chars"
+
+# Container Sizing (Cost-Optimized Graviton/Fargate)
+fargate_cpu    = 256
+fargate_memory = 512
+min_capacity   = 1
+max_capacity   = 3

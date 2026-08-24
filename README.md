@@ -233,6 +233,23 @@ npm run build
 
 ---
 
+## Deployment Options
+
+Recess supports two turnkey production deployment paths:
+
+### 1. AWS Production Architecture (Terraform + ECS Fargate + RDS + CloudFront)
+- **Modular Terraform IaC**: [`infra/terraform/`](file:///home/kalki/Desktop/Recess/infra/terraform)
+- **Architecture**: CloudFront CDN $\to$ ALB $\to$ ECS Fargate Go Backend $\to$ RDS PostgreSQL + ElastiCache Redis
+- **Cost-Optimized**: ~$48–$56/mo utilizing Graviton/t4g micro instances and Free Tier resources.
+- **Full Guide**: [AWS Production Deployment & Rollback Runbook](file:///home/kalki/Desktop/Recess/docs/aws-deployment.md)
+
+### 2. Zero-Cost / Free Tier Deployment (Vercel + Railway + Supabase + Upstash)
+- **Architecture**: Vercel (Frontend React SPA) + Railway/Render (Go Backend) + Supabase (Postgres) + Upstash (Redis)
+- **100% Free**: $0.00/month on standard developer free tiers.
+- **Full Guide**: [Zero-Cost Free Tier Deployment Guide](file:///home/kalki/Desktop/Recess/docs/zero-cost-deployment.md)
+
+---
+
 ## Makefile Targets
 
 | Target | Description |
