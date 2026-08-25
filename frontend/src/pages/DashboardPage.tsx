@@ -118,7 +118,7 @@ export const DashboardPage: React.FC = () => {
       <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Student ID / Report Card */}
         <PaperCard variant="ruled" className="p-6 relative lg:col-span-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#CBD5E1]">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-[#CBD5E1] dark:border-slate-700/60">
             <div className="flex items-center gap-3">
               <Avatar
                 username={user?.username || 'Student'}
@@ -128,23 +128,23 @@ export const DashboardPage: React.FC = () => {
               />
               <div>
                 <div className="flex items-center gap-2">
-                  <h2 className="text-xl font-bold text-[#1E242B]">
+                  <h2 className="text-xl font-bold text-[#1E242B] dark:text-slate-100">
                     {user?.username || 'Student'}
                   </h2>
                   <Stamp tone="green">ACTIVE</Stamp>
                 </div>
-                <p className="font-hand text-base text-[#1A365D]">
+                <p className="font-hand text-base text-[#1A365D] dark:text-sky-300">
                   {user?.title || 'Classroom Rookie'} • {user?.is_guest ? 'Guest Pass' : 'Enrolled Student'}
                 </p>
               </div>
             </div>
 
             <div className="text-right flex items-center gap-2">
-              <div className="bg-[#FEF9C3] px-3 py-1.5 rounded border border-[#FDE047] text-left">
-                <span className="text-[10px] font-mono text-[#854D0E] uppercase block">
+              <div className="bg-[#FEF9C3] dark:bg-amber-950/40 px-3 py-1.5 rounded border border-[#FDE047] dark:border-amber-700/60 text-left">
+                <span className="text-[10px] font-mono text-[#854D0E] dark:text-amber-300 uppercase block font-bold">
                   Overall Rating
                 </span>
-                <span className="font-mono text-lg font-black text-[#1E242B]">
+                <span className="font-mono text-lg font-black text-[#1E242B] dark:text-slate-100">
                   {user?.rating || 1200} ELO
                 </span>
               </div>
@@ -153,27 +153,27 @@ export const DashboardPage: React.FC = () => {
 
           {/* Academic Report Metrics */}
           <div className="grid grid-cols-3 gap-4 pt-4 text-center">
-            <div className="bg-[#F8FAFC] p-3 rounded border border-[#E2E8F0]">
-              <span className="text-[11px] font-mono text-[#64748B] uppercase block">
+            <div className="bg-[#F8FAFC] dark:bg-slate-900/60 p-3 rounded border border-[#E2E8F0] dark:border-slate-700/60">
+              <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block font-semibold">
                 Games Played
               </span>
-              <span className="text-2xl font-black text-[#1E242B] font-mono">
+              <span className="text-2xl font-black text-[#1E242B] dark:text-slate-100 font-mono">
                 {gamesPlayed}
               </span>
             </div>
-            <div className="bg-[#F8FAFC] p-3 rounded border border-[#E2E8F0]">
-              <span className="text-[11px] font-mono text-[#64748B] uppercase block">
+            <div className="bg-[#F8FAFC] dark:bg-slate-900/60 p-3 rounded border border-[#E2E8F0] dark:border-slate-700/60">
+              <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block font-semibold">
                 Victories
               </span>
-              <span className="text-2xl font-black text-[#15803D] font-mono">
+              <span className="text-2xl font-black text-[#15803D] dark:text-emerald-400 font-mono">
                 {gamesWon}
               </span>
             </div>
-            <div className="bg-[#F8FAFC] p-3 rounded border border-[#E2E8F0]">
-              <span className="text-[11px] font-mono text-[#64748B] uppercase block">
+            <div className="bg-[#F8FAFC] dark:bg-slate-900/60 p-3 rounded border border-[#E2E8F0] dark:border-slate-700/60">
+              <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block font-semibold">
                 Win Rate
               </span>
-              <span className="text-2xl font-black text-[#1A365D] font-mono">
+              <span className="text-2xl font-black text-[#1A365D] dark:text-sky-400 font-mono">
                 {winRate}%
               </span>
             </div>
@@ -184,10 +184,10 @@ export const DashboardPage: React.FC = () => {
         <PaperCard variant="sticky" stickyColor="yellow" showPushPin className="p-6 flex flex-col justify-between">
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <Swords className="w-5 h-5 text-[#B45309]" />
-              <h3 className="font-bold text-base text-[#1E242B]">Enter Classroom Code</h3>
+              <Swords className="w-5 h-5 text-[#B45309] dark:text-amber-400" />
+              <h3 className="font-bold text-base text-[#1E242B] dark:text-amber-200">Enter Classroom Code</h3>
             </div>
-            <p className="font-hand text-base text-[#1A365D]">
+            <p className="font-hand text-base text-[#1A365D] dark:text-amber-100/90">
               Got an invite code from a benchmate? Enter it below to join their desk immediately.
             </p>
 
@@ -204,7 +204,7 @@ export const DashboardPage: React.FC = () => {
             </form>
           </div>
 
-          <div className="pt-4 mt-4 border-t border-yellow-300">
+          <div className="pt-4 mt-4 border-t border-yellow-300 dark:border-amber-700/60">
             <Button
               onClick={() => setIsCreateModalOpen(true)}
               variant="secondary"
@@ -220,12 +220,12 @@ export const DashboardPage: React.FC = () => {
 
       {/* 2. Quick Game Select Grid */}
       <section className="space-y-4">
-        <div className="flex items-center justify-between border-b-2 border-[#1E242B] pb-2">
+        <div className="flex items-center justify-between border-b-2 border-[#1E242B] dark:border-slate-700 pb-2">
           <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-[#1E242B]">Choose Game Arena</h2>
+            <h2 className="text-xl font-bold text-[#1E242B] dark:text-slate-100">Choose Game Arena</h2>
             <Stamp tone="amber">6 ARENAS</Stamp>
           </div>
-          <Link to="/games" className="text-xs font-bold text-[#1A365D] hover:underline">
+          <Link to="/games" className="text-xs font-bold text-[#1A365D] dark:text-sky-400 hover:underline">
             View Rules & Syllabus →
           </Link>
         </div>
@@ -235,7 +235,7 @@ export const DashboardPage: React.FC = () => {
             <PaperCard
               key={game.id}
               variant="plain"
-              className="p-4 text-center hover:shadow-[4px_4px_0px_0px_#1E242B] hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center justify-between group"
+              className="p-4 text-center hover:shadow-[4px_4px_0px_0px_#1E242B] dark:hover:shadow-[4px_4px_0px_0px_#020617] hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center justify-between group"
               onClick={() => {
                 setMatchmakingGame({
                   id: game.id,
@@ -245,7 +245,7 @@ export const DashboardPage: React.FC = () => {
               }}
             >
               <span className="text-3xl mb-2">{game.icon}</span>
-              <h4 className="font-bold text-sm text-[#1E242B] group-hover:text-[#1A365D] transition-colors leading-tight">
+              <h4 className="font-bold text-sm text-[#1E242B] dark:text-slate-200 group-hover:text-[#1A365D] group-hover:dark:text-sky-300 transition-colors leading-tight">
                 {game.name}
               </h4>
               <Badge variant="pencil" size="sm" className="mt-2">
@@ -282,19 +282,19 @@ export const DashboardPage: React.FC = () => {
               activeRooms.map((room) => (
                 <div
                   key={room.id}
-                  className="bg-white rounded p-4 border-2 border-[#1E242B] shadow-[3px_3px_0px_0px_#1E242B] flex items-center justify-between"
+                  className="bg-white dark:bg-slate-900/90 rounded p-4 border-2 border-[#1E242B] dark:border-slate-700 shadow-[3px_3px_0px_0px_#1E242B] dark:shadow-[3px_3px_0px_0px_#020617] flex items-center justify-between"
                 >
                   <div>
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-xs bg-[#F2EDE0] px-2 py-0.5 rounded border border-[#CBD5E1]">
+                      <span className="font-mono font-bold text-xs bg-[#F2EDE0] dark:bg-slate-800 text-[#1E242B] dark:text-amber-300 px-2 py-0.5 rounded border border-[#CBD5E1] dark:border-slate-700">
                         {room.code}
                       </span>
                       <Badge variant="ink-blue" size="sm">
                         {room.game_type}
                       </Badge>
                     </div>
-                    <h4 className="font-bold text-sm text-[#1E242B] mt-1">{room.title}</h4>
-                    <p className="text-xs text-[#475569] font-hand">
+                    <h4 className="font-bold text-sm text-[#1E242B] dark:text-slate-100 mt-1">{room.title}</h4>
+                    <p className="text-xs text-[#475569] dark:text-slate-400 font-hand">
                       Hosted by @{room.host || 'Classmate'}
                     </p>
                   </div>
@@ -318,8 +318,8 @@ export const DashboardPage: React.FC = () => {
                 </div>
               ))
             ) : (
-              <div className="col-span-full py-6 text-center bg-white/60 rounded border-2 border-dashed border-[#CBD5E1]">
-                <p className="font-hand text-base text-[#475569]">
+              <div className="col-span-full py-6 text-center bg-white/60 dark:bg-slate-900/50 rounded border-2 border-dashed border-[#CBD5E1] dark:border-slate-700">
+                <p className="font-hand text-base text-[#475569] dark:text-slate-300">
                   No active desks at the moment. Pick a game above to host the first match!
                 </p>
               </div>

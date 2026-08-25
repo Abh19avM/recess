@@ -58,14 +58,14 @@ export const RegisterPage: React.FC = () => {
       <PaperCard variant="ruled" className="p-8 sm:p-10 relative">
         {/* Top Stamp */}
         <div className="flex items-center justify-between mb-4">
-          <span className="font-hand text-xl text-[#1A365D] font-bold">New Admission</span>
+          <span className="font-hand text-xl text-[#1A365D] dark:text-sky-300 font-bold">New Admission</span>
           <Stamp tone="green">ENROLLMENT</Stamp>
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B] dark:text-slate-100 tracking-tight">
           Student Registration
         </h2>
-        <p className="font-hand text-base text-[#475569] mt-0.5">
+        <p className="font-hand text-base text-[#475569] dark:text-slate-300 mt-0.5">
           Claim your unique classroom handle to track rankings, streaks, and tournament trophies.
         </p>
 

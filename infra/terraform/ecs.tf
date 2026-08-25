@@ -119,14 +119,6 @@ resource "aws_ecs_task_definition" "backend" {
           "awslogs-stream-prefix" = "backend"
         }
       }
-
-      healthCheck = {
-        command     = ["CMD-SHELL", "wget -q --spider http://127.0.0.1:8080/health || exit 1"]
-        interval    = 15
-        timeout     = 5
-        retries     = 3
-        startPeriod = 10
-      }
     }
   ])
 }

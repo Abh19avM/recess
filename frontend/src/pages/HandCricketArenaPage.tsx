@@ -263,7 +263,7 @@ export const HandCricketArenaPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-16">
       {/* 1. Header Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] dark:border-slate-700 pb-4">
         <div className="flex items-center gap-3">
           <Link to="/games">
             <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
@@ -272,11 +272,11 @@ export const HandCricketArenaPage: React.FC = () => {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-extrabold text-[#1E242B]">Hand Cricket Arena</h1>
+              <h1 className="text-2xl font-extrabold text-[#1E242B] dark:text-slate-100">Hand Cricket Arena</h1>
               <Stamp tone="amber">FLAGSHIP ARENA</Stamp>
             </div>
-            <p className="font-hand text-sm text-[#475569]">
-              Room: <span className="font-mono font-bold text-[#1A365D]">{targetRoom}</span> • 1-6 Finger Clashes
+            <p className="font-hand text-sm text-[#475569] dark:text-slate-300">
+              Room: <span className="font-mono font-bold text-[#1A365D] dark:text-sky-300">{targetRoom}</span> • 1-6 Finger Clashes
             </p>
           </div>
         </div>
@@ -298,11 +298,11 @@ export const HandCricketArenaPage: React.FC = () => {
           {!isBotMode && (
             <div className="flex items-center gap-1 text-xs font-mono">
               {status === 'OPEN' ? (
-                <span className="flex items-center gap-1 text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded border border-[#86EFAC]">
+                <span className="flex items-center gap-1 text-[#15803D] dark:text-emerald-300 bg-[#DCFCE7] dark:bg-emerald-950/60 px-2 py-1 rounded border border-[#86EFAC] dark:border-emerald-700/60">
                   <Wifi className="w-3.5 h-3.5" /> LIVE
                 </span>
               ) : (
-                <span className="flex items-center gap-1 text-[#991B1B] bg-[#FFE4E6] px-2 py-1 rounded border border-[#FECDD3]">
+                <span className="flex items-center gap-1 text-[#991B1B] dark:text-red-300 bg-[#FFE4E6] dark:bg-red-950/60 px-2 py-1 rounded border border-[#FECDD3] dark:border-red-700/60">
                   <WifiOff className="w-3.5 h-3.5" /> OFFLINE
                 </span>
               )}
@@ -318,9 +318,9 @@ export const HandCricketArenaPage: React.FC = () => {
           {/* Handwritten Scoreboard Box */}
           <PaperCard variant="ruled" className="p-6 relative">
             {/* Top Match Status */}
-            <div className="flex items-start justify-between pb-3 border-b border-[#CBD5E1] mb-4">
+            <div className="flex items-start justify-between pb-3 border-b border-[#CBD5E1] dark:border-slate-700/60 mb-4">
               <div>
-                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#475569]">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-[#475569] dark:text-slate-400">
                   {isBotMode
                     ? `Practice Mode • ${botPhase === 'innings2' ? '2nd Innings (Chase)' : '1st Innings'}`
                     : phase === 'toss_call' || phase === 'toss_throw' || phase === 'toss_decision'
@@ -331,11 +331,11 @@ export const HandCricketArenaPage: React.FC = () => {
                     ? `2nd Innings • Chasing ${board?.target || 0} Runs`
                     : 'Match Completed'}
                 </span>
-                <h2 className="text-3xl font-extrabold text-[#1E242B] font-mono mt-0.5">
+                <h2 className="text-3xl font-extrabold text-[#1E242B] dark:text-slate-100 font-mono mt-0.5">
                   {isBotMode
                     ? `${botPhase === 'innings2' ? botInn2Runs : botInn1Runs} / 0`
                     : `${activeInnings?.runs || 0} / ${activeInnings?.wickets || 0}`}
-                  <span className="text-sm font-hand text-[#475569] font-normal ml-2">
+                  <span className="text-sm font-hand text-[#475569] dark:text-slate-400 font-normal ml-2">
                     ({isBotMode ? `${Math.floor(botBalls / 6)}.${botBalls % 6}` : `${Math.floor((activeInnings?.balls_bowled || 0) / 6)}.${(activeInnings?.balls_bowled || 0) % 6}`} Overs)
                   </span>
                 </h2>
@@ -349,20 +349,20 @@ export const HandCricketArenaPage: React.FC = () => {
                 ) : (
                   board?.target && <Stamp tone="red">TARGET: {board.target}</Stamp>
                 )}
-                {myRole && <div className="font-hand text-sm text-[#1A365D] mt-1 font-bold">You are {myRole}</div>}
+                {myRole && <div className="font-hand text-sm text-[#1A365D] dark:text-sky-300 mt-1 font-bold">You are {myRole}</div>}
               </div>
             </div>
 
             {/* Ball Reveal & Commentary */}
-            <div className="bg-[#FEF9C3] p-4 rounded-lg border border-[#FDE047] min-h-[90px] flex items-center justify-between">
+            <div className="bg-[#FEF9C3] dark:bg-amber-950/40 p-4 rounded-lg border border-[#FDE047] dark:border-amber-700/60 min-h-[90px] flex items-center justify-between">
               {isBotMode ? (
                 botLastBall ? (
                   <div className="w-full flex items-center justify-between">
                     <div>
-                      <span className="text-xs font-mono font-bold text-[#854D0E]">LAST BALL REVEAL:</span>
-                      <p className="font-hand text-lg text-[#1E242B] font-bold">
-                        You: <span className="font-mono text-[#1A365D]">{botLastBall.player}</span> • Bot:{' '}
-                        <span className="font-mono text-[#991B1B]">{botLastBall.bot}</span>
+                      <span className="text-xs font-mono font-bold text-[#854D0E] dark:text-amber-300">LAST BALL REVEAL:</span>
+                      <p className="font-hand text-lg text-[#1E242B] dark:text-amber-100 font-bold">
+                        You: <span className="font-mono text-[#1A365D] dark:text-sky-300">{botLastBall.player}</span> • Bot:{' '}
+                        <span className="font-mono text-[#991B1B] dark:text-red-400">{botLastBall.bot}</span>
                       </p>
                     </div>
                     {botLastBall.isOut ? (
@@ -372,19 +372,19 @@ export const HandCricketArenaPage: React.FC = () => {
                     )}
                   </div>
                 ) : (
-                  <p className="font-hand text-base text-[#854D0E]">
+                  <p className="font-hand text-base text-[#854D0E] dark:text-amber-200">
                     Show your fingers under the desk! Pick a number 1 to 6.
                   </p>
                 )
               ) : board?.last_resolved ? (
                 <div className="w-full flex items-center justify-between">
                   <div>
-                    <span className="text-xs font-mono font-bold text-[#854D0E]">LAST BALL REVEAL:</span>
-                    <p className="font-hand text-base text-[#1E242B] font-bold">
-                      Batsman: <span className="font-mono text-[#1A365D]">{board.last_resolved.batsman_choice}</span> • Bowler:{' '}
-                      <span className="font-mono text-[#991B1B]">{board.last_resolved.bowler_choice}</span>
+                    <span className="text-xs font-mono font-bold text-[#854D0E] dark:text-amber-300">LAST BALL REVEAL:</span>
+                    <p className="font-hand text-base text-[#1E242B] dark:text-amber-100 font-bold">
+                      Batsman: <span className="font-mono text-[#1A365D] dark:text-sky-300">{board.last_resolved.batsman_choice}</span> • Bowler:{' '}
+                      <span className="font-mono text-[#991B1B] dark:text-red-400">{board.last_resolved.bowler_choice}</span>
                     </p>
-                    <p className="text-xs text-[#854D0E] italic">{board.last_resolved.commentary}</p>
+                    <p className="text-xs text-[#854D0E] dark:text-amber-300/80 italic">{board.last_resolved.commentary}</p>
                   </div>
                   {board.last_resolved.is_wicket ? (
                     <Stamp tone="red">OUT!</Stamp>
@@ -395,7 +395,7 @@ export const HandCricketArenaPage: React.FC = () => {
                   )}
                 </div>
               ) : (
-                <p className="font-hand text-base text-[#854D0E]">
+                <p className="font-hand text-base text-[#854D0E] dark:text-amber-200">
                   {phase === 'toss_call'
                     ? isTossCaller
                       ? '✎ You won the call! Choose Odd or Even.'
@@ -414,7 +414,7 @@ export const HandCricketArenaPage: React.FC = () => {
 
           {/* 3. Interactive Finger / Number Throw Controls */}
           <PaperCard variant="plain" className="p-6">
-            <h3 className="text-sm font-bold text-[#1E242B] uppercase tracking-wider font-mono mb-4 pb-2 border-b border-[#CBD5E1] flex items-center justify-between">
+            <h3 className="text-sm font-bold text-[#1E242B] dark:text-slate-100 uppercase tracking-wider font-mono mb-4 pb-2 border-b border-[#CBD5E1] dark:border-slate-700 flex items-center justify-between">
               <span>Secret Finger Throw (1 to 6)</span>
               {hasLockedChoice && <Stamp tone="green">CHOICE LOCKED ✓</Stamp>}
             </h3>
@@ -458,12 +458,12 @@ export const HandCricketArenaPage: React.FC = () => {
                     (!isBotMode && (gameState?.status !== 'active' || hasLockedChoice)) ||
                     (isBotMode && !!botWinnerMsg)
                   }
-                  className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-[#1E242B] bg-[#FFFFFF] hover:bg-[#FEF9C3] hover:border-[#1A365D] active:scale-95 shadow-[3px_3px_0px_0px_#1E242B] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                  className="flex flex-col items-center justify-center p-4 rounded-xl border-2 border-[#1E242B] dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-[#FEF9C3] dark:hover:bg-slate-800 hover:border-[#1A365D] dark:hover:border-sky-500 active:scale-95 shadow-[3px_3px_0px_0px_#1E242B] dark:shadow-[3px_3px_0px_0px_#020617] transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
                 >
-                  <span className="text-3xl font-extrabold font-mono text-[#1E242B] group-hover:text-[#1A365D]">
+                  <span className="text-3xl font-extrabold font-mono text-[#1E242B] dark:text-slate-100 group-hover:text-[#1A365D] group-hover:dark:text-sky-300">
                     {num}
                   </span>
-                  <span className="font-hand text-xs text-[#475569] mt-1 font-bold">
+                  <span className="font-hand text-xs text-[#475569] dark:text-slate-400 mt-1 font-bold">
                     {num === 1
                       ? '☝️ One'
                       : num === 2

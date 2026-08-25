@@ -16,7 +16,7 @@ resource "aws_db_instance" "postgres" {
   max_allocated_storage  = 50
   storage_type           = "gp3"
   engine                 = "postgres"
-  engine_version         = "16.2"
+  engine_version         = "16.9"
   instance_class         = "db.t4g.micro"
   db_name                = "recess"
   username               = var.db_username
@@ -27,7 +27,7 @@ resource "aws_db_instance" "postgres" {
   skip_final_snapshot    = true
   deletion_protection    = false
 
-  backup_retention_period   = 7
+  backup_retention_period   = 1
   auto_minor_version_upgrade = true
 
   tags = {

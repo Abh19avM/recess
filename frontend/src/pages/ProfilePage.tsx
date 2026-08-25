@@ -190,25 +190,25 @@ export const ProfilePage: React.FC = () => {
   return (
     <div className="space-y-8 max-w-5xl mx-auto pb-16">
       {/* 1. Header Navigation Tabs */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] dark:border-slate-700 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-extrabold text-[#1E242B]">Student Academic Dossier</h1>
+            <h1 className="text-2xl font-extrabold text-[#1E242B] dark:text-slate-100">Student Academic Dossier</h1>
             <Stamp tone="amber">TERM 2026</Stamp>
           </div>
-          <p className="font-hand text-sm text-[#475569]">
+          <p className="font-hand text-sm text-[#475569] dark:text-slate-300">
             Official classroom performance record, duel ledger, and stamped achievements.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-2 bg-[#F1F5F9] p-1 rounded-lg border border-[#CBD5E1]">
+        <div className="flex items-center gap-2 bg-[#F1F5F9] dark:bg-slate-900/80 p-1 rounded-lg border border-[#CBD5E1] dark:border-slate-700">
           <button
             onClick={() => setActiveTab('report_card')}
             className={`px-3 py-1.5 rounded-md text-xs font-bold font-mono transition-all ${
               activeTab === 'report_card'
-                ? 'bg-[#1A365D] text-white shadow-xs'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-[#1A365D] dark:bg-sky-700 text-white shadow-xs'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             Report Card
@@ -217,8 +217,8 @@ export const ProfilePage: React.FC = () => {
             onClick={() => setActiveTab('history')}
             className={`px-3 py-1.5 rounded-md text-xs font-bold font-mono transition-all ${
               activeTab === 'history'
-                ? 'bg-[#1A365D] text-white shadow-xs'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-[#1A365D] dark:bg-sky-700 text-white shadow-xs'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             Match Ledger ({matchHistory.length})
@@ -227,8 +227,8 @@ export const ProfilePage: React.FC = () => {
             onClick={() => setActiveTab('achievements')}
             className={`px-3 py-1.5 rounded-md text-xs font-bold font-mono transition-all ${
               activeTab === 'achievements'
-                ? 'bg-[#1A365D] text-white shadow-xs'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-[#1A365D] dark:bg-sky-700 text-white shadow-xs'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             Stamps ({unlockedAchievementsCount}/{achievements.length})
@@ -243,22 +243,22 @@ export const ProfilePage: React.FC = () => {
           <PaperCard variant="ruled" className="p-8 sm:p-10 relative overflow-hidden">
             {/* Watermark Crest Stamp */}
             <div className="absolute right-6 top-6 opacity-15 pointer-events-none select-none text-right">
-              <span className="font-serif text-6xl font-black block tracking-widest text-[#1A365D]">RECESS</span>
-              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1A365D]">Academic Board</span>
+              <span className="font-serif text-6xl font-black block tracking-widest text-[#1A365D] dark:text-sky-400">RECESS</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-widest text-[#1A365D] dark:text-sky-400">Academic Board</span>
             </div>
 
             {/* School Heading */}
-            <div className="text-center pb-6 border-b-2 border-[#1E242B] space-y-1">
+            <div className="text-center pb-6 border-b-2 border-[#1E242B] dark:border-slate-700 space-y-1">
               <div className="flex items-center justify-center gap-2">
-                <GraduationCap className="w-6 h-6 text-[#1A365D]" />
-                <h2 className="font-serif text-2xl sm:text-3xl font-extrabold uppercase tracking-wide text-[#1E242B]">
+                <GraduationCap className="w-6 h-6 text-[#1A365D] dark:text-sky-400" />
+                <h2 className="font-serif text-2xl sm:text-3xl font-extrabold uppercase tracking-wide text-[#1E242B] dark:text-slate-100">
                   Recess Central Board of Play
                 </h2>
               </div>
-              <p className="font-mono text-xs text-[#475569] uppercase tracking-widest">
+              <p className="font-mono text-xs text-[#475569] dark:text-slate-400 uppercase tracking-widest">
                 Official Student Athletic & Tactical Proficiency Report Card
               </p>
-              <div className="flex items-center justify-center gap-6 pt-2 font-mono text-xs font-bold text-[#1A365D]">
+              <div className="flex items-center justify-center gap-6 pt-2 font-mono text-xs font-bold text-[#1A365D] dark:text-sky-300">
                 <span>ROLL NO: #REC-2026-{user?.id?.substring(0, 4).toUpperCase() || '4890'}</span>
                 <span>•</span>
                 <span>HOUSE: EMERALD TACTICIANS</span>
@@ -268,7 +268,7 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Student ID & Overview Banner */}
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-6 pb-6 border-b border-[#CBD5E1] items-center">
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-6 pt-6 pb-6 border-b border-[#CBD5E1] dark:border-slate-700/60 items-center">
               {/* Photo & Name (7 cols) */}
               <div className="md:col-span-7 flex items-center gap-5">
                 <div className="relative">
@@ -278,32 +278,32 @@ export const ProfilePage: React.FC = () => {
                   </div>
                 </div>
                 <div>
-                  <h3 className="text-2xl font-black text-[#1E242B]">@{user?.username}</h3>
-                  <p className="font-hand text-lg text-[#1A365D] font-bold">
+                  <h3 className="text-2xl font-black text-[#1E242B] dark:text-slate-100">@{user?.username}</h3>
+                  <p className="font-hand text-lg text-[#1A365D] dark:text-sky-300 font-bold">
                     Title: {user?.title || 'Classroom Valedictorian'}
                   </p>
-                  <p className="font-mono text-xs text-[#64748B]">
+                  <p className="font-mono text-xs text-[#64748B] dark:text-slate-400">
                     Student Since: {new Date(user?.created_at || Date.now()).toLocaleDateString([], { month: 'short', year: 'numeric' })}
                   </p>
                 </div>
               </div>
 
               {/* Cumulative ELO Grade Box (5 cols) */}
-              <div className="md:col-span-5 bg-[#FEF9C3] p-4 rounded-xl border-2 border-[#FDE047] shadow-xs text-center flex items-center justify-around">
+              <div className="md:col-span-5 bg-[#FEF9C3] dark:bg-amber-950/40 p-4 rounded-xl border-2 border-[#FDE047] dark:border-amber-700/60 shadow-xs text-center flex items-center justify-around">
                 <div>
-                  <span className="text-[10px] font-mono text-[#854D0E] uppercase block font-bold">
+                  <span className="text-[10px] font-mono text-[#854D0E] dark:text-amber-300 uppercase block font-bold">
                     Cumulative Rating
                   </span>
-                  <span className="font-mono text-3xl font-black text-[#1E242B]">
-                    {overallRating} <span className="text-xs font-normal text-[#854D0E]">ELO</span>
+                  <span className="font-mono text-3xl font-black text-[#1E242B] dark:text-slate-100">
+                    {overallRating} <span className="text-xs font-normal text-[#854D0E] dark:text-amber-300">ELO</span>
                   </span>
                 </div>
-                <div className="w-px h-10 bg-[#FDE047]" />
+                <div className="w-px h-10 bg-[#FDE047] dark:bg-amber-700/60" />
                 <div>
-                  <span className="text-[10px] font-mono text-[#854D0E] uppercase block font-bold">
+                  <span className="text-[10px] font-mono text-[#854D0E] dark:text-amber-300 uppercase block font-bold">
                     Academic Rank
                   </span>
-                  <span className="font-serif text-3xl font-black text-[#15803D]">
+                  <span className="font-serif text-3xl font-black text-[#15803D] dark:text-emerald-400">
                     A+
                   </span>
                 </div>
@@ -311,30 +311,30 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Academic Standing Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-b border-[#CBD5E1] text-center">
-              <div className="p-3 bg-white rounded-lg border border-[#CBD5E1] shadow-2xs">
-                <span className="text-[11px] font-mono text-[#64748B] uppercase block">Total Duels</span>
-                <span className="text-2xl font-mono font-black text-[#1E242B]">{totalPlayed}</span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-b border-[#CBD5E1] dark:border-slate-700/60 text-center">
+              <div className="p-3 bg-white dark:bg-slate-900/70 rounded-lg border border-[#CBD5E1] dark:border-slate-700/60 shadow-2xs">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block">Total Duels</span>
+                <span className="text-2xl font-mono font-black text-[#1E242B] dark:text-slate-100">{totalPlayed}</span>
               </div>
-              <div className="p-3 bg-white rounded-lg border border-[#CBD5E1] shadow-2xs">
-                <span className="text-[11px] font-mono text-[#64748B] uppercase block">Victories</span>
-                <span className="text-2xl font-mono font-black text-[#15803D]">{totalWon}</span>
+              <div className="p-3 bg-white dark:bg-slate-900/70 rounded-lg border border-[#CBD5E1] dark:border-slate-700/60 shadow-2xs">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block">Victories</span>
+                <span className="text-2xl font-mono font-black text-[#15803D] dark:text-emerald-400">{totalWon}</span>
               </div>
-              <div className="p-3 bg-white rounded-lg border border-[#CBD5E1] shadow-2xs">
-                <span className="text-[11px] font-mono text-[#64748B] uppercase block">Defeats</span>
-                <span className="text-2xl font-mono font-black text-[#991B1B]">{totalLost}</span>
+              <div className="p-3 bg-white dark:bg-slate-900/70 rounded-lg border border-[#CBD5E1] dark:border-slate-700/60 shadow-2xs">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block">Defeats</span>
+                <span className="text-2xl font-mono font-black text-[#991B1B] dark:text-red-400">{totalLost}</span>
               </div>
-              <div className="p-3 bg-white rounded-lg border border-[#CBD5E1] shadow-2xs">
-                <span className="text-[11px] font-mono text-[#64748B] uppercase block">Win Ratio</span>
-                <span className="text-2xl font-mono font-black text-[#1A365D]">{winRate}%</span>
+              <div className="p-3 bg-white dark:bg-slate-900/70 rounded-lg border border-[#CBD5E1] dark:border-slate-700/60 shadow-2xs">
+                <span className="text-[11px] font-mono text-[#64748B] dark:text-slate-400 uppercase block">Win Ratio</span>
+                <span className="text-2xl font-mono font-black text-[#1A365D] dark:text-sky-400">{winRate}%</span>
               </div>
             </div>
 
             {/* Subject-Wise Performance Breakdown Table */}
             <div className="pt-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="font-bold text-base text-[#1E242B] flex items-center gap-2">
-                  <BookOpen className="w-4 h-4 text-[#1A365D]" />
+                <h4 className="font-bold text-base text-[#1E242B] dark:text-slate-100 flex items-center gap-2">
+                  <BookOpen className="w-4 h-4 text-[#1A365D] dark:text-sky-400" />
                   Subject-Wise Athletic Breakdown
                 </h4>
                 <Stamp tone="blue">6 COURSES</Stamp>
@@ -343,7 +343,7 @@ export const ProfilePage: React.FC = () => {
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs font-mono border-collapse">
                   <thead>
-                    <tr className="border-b-2 border-[#1E242B] bg-[#F8FAFC] text-[#475569]">
+                    <tr className="border-b-2 border-[#1E242B] dark:border-slate-700 bg-[#F8FAFC] dark:bg-slate-900 text-[#475569] dark:text-slate-300">
                       <th className="py-2.5 px-3 uppercase font-bold">Course / Game</th>
                       <th className="py-2.5 px-3 uppercase font-bold text-center">Rating</th>
                       <th className="py-2.5 px-3 uppercase font-bold text-center">Played</th>
@@ -352,29 +352,29 @@ export const ProfilePage: React.FC = () => {
                       <th className="py-2.5 px-3 uppercase font-bold text-right">Remarks</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-[#E2E8F0]">
+                  <tbody className="divide-y divide-[#E2E8F0] dark:divide-slate-800">
                     {gameRatings.map((stat) => {
                       const evalGrade = getSubjectGrade(stat.rating)
                       return (
-                        <tr key={stat.game_type} className="hover:bg-slate-50/80 transition-colors">
-                          <td className="py-3 px-3 font-sans font-bold text-sm text-[#1E242B]">
+                        <tr key={stat.game_type} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-colors">
+                          <td className="py-3 px-3 font-sans font-bold text-sm text-[#1E242B] dark:text-slate-100">
                             {formatGameName(stat.game_type)}
                           </td>
-                          <td className="py-3 px-3 text-center font-bold text-[#1A365D]">
+                          <td className="py-3 px-3 text-center font-bold text-[#1A365D] dark:text-sky-300">
                             {stat.rating} ELO
                           </td>
-                          <td className="py-3 px-3 text-center text-[#475569]">
+                          <td className="py-3 px-3 text-center text-[#475569] dark:text-slate-300">
                             {stat.played}
                           </td>
                           <td className="py-3 px-3 text-center">
-                            <span className="text-[#15803D] font-bold">{stat.won}W</span> - <span className="text-[#991B1B] font-bold">{stat.lost}L</span>
+                            <span className="text-[#15803D] dark:text-emerald-400 font-bold">{stat.won}W</span> - <span className="text-[#991B1B] dark:text-red-400 font-bold">{stat.lost}L</span>
                           </td>
                           <td className="py-3 px-3 text-center">
                             <Badge variant={stat.rating >= 1250 ? 'green' : stat.rating >= 1200 ? 'ink-blue' : 'default'} size="sm">
                               {evalGrade.grade}
                             </Badge>
                           </td>
-                          <td className="py-3 px-3 text-right font-hand text-sm text-[#1A365D]">
+                          <td className="py-3 px-3 text-right font-hand text-sm text-[#1A365D] dark:text-sky-300">
                             {evalGrade.remark}
                           </td>
                         </tr>
@@ -386,17 +386,17 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Arbiter / Teacher's Handwritten Evaluation Remarks */}
-            <div className="mt-8 p-5 bg-[#FFFBEB] rounded-xl border border-[#FDE68A] relative">
+            <div className="mt-8 p-5 bg-[#FFFBEB] dark:bg-amber-950/40 rounded-xl border border-[#FDE68A] dark:border-amber-700/60 relative">
               <div className="flex items-center gap-2 mb-1">
-                <Sparkles className="w-4 h-4 text-[#B45309]" />
-                <h5 className="font-mono text-xs uppercase font-bold text-[#92400E]">
+                <Sparkles className="w-4 h-4 text-[#B45309] dark:text-amber-400" />
+                <h5 className="font-mono text-xs uppercase font-bold text-[#92400E] dark:text-amber-300">
                   Class Teacher & Arbiter Remarks:
                 </h5>
               </div>
-              <p className="font-hand text-base text-[#1E242B] leading-relaxed">
+              <p className="font-hand text-base text-[#1E242B] dark:text-amber-100 leading-relaxed">
                 "@{user?.username} demonstrates remarkable hand-eye composure and tactical intuition across all classroom periods. Particularly dominant in Hand Cricket batting innings. Promoted to Senior Recess League with Honors."
               </p>
-              <div className="text-right mt-2 font-hand text-sm font-bold text-[#B45309]">
+              <div className="text-right mt-2 font-hand text-sm font-bold text-[#B45309] dark:text-amber-400">
                 — Head Arbiter, Recess Examination Board
               </div>
             </div>
@@ -404,7 +404,7 @@ export const ProfilePage: React.FC = () => {
 
           {/* Avatar Stamp Selector Box */}
           <PaperCard variant="plain" className="p-6">
-            <h4 className="font-bold text-sm text-[#1E242B] uppercase font-mono mb-4">
+            <h4 className="font-bold text-sm text-[#1E242B] dark:text-slate-100 uppercase font-mono mb-4">
               Select ID Photograph Badge:
             </h4>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -414,12 +414,12 @@ export const ProfilePage: React.FC = () => {
                   onClick={() => handleSaveAvatar(opt.id)}
                   className={`p-4 rounded-xl border-2 text-center cursor-pointer transition-all flex flex-col items-center justify-between ${
                     selectedAvatar === opt.id
-                      ? 'border-[#1A365D] bg-[#E0F2FE] shadow-[3px_3px_0px_0px_#1A365D]'
-                      : 'border-[#CBD5E1] bg-white hover:bg-slate-50'
+                      ? 'border-[#1A365D] dark:border-sky-500 bg-[#E0F2FE] dark:bg-sky-950/50 shadow-[3px_3px_0px_0px_#1A365D] dark:shadow-[3px_3px_0px_0px_#020617]'
+                      : 'border-[#CBD5E1] dark:border-slate-700 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800'
                   }`}
                 >
                   <Avatar username={user?.username || 'You'} size="md" />
-                  <span className="font-bold text-xs text-[#1E242B] mt-2 block">{opt.name}</span>
+                  <span className="font-bold text-xs text-[#1E242B] dark:text-slate-100 mt-2 block">{opt.name}</span>
                   {selectedAvatar === opt.id && (
                     <Badge variant="green" size="sm" className="mt-2">
                       <Check className="w-3 h-3 mr-1 inline" /> ACTIVE
@@ -448,7 +448,7 @@ export const ProfilePage: React.FC = () => {
               {matchHistory.map((item) => (
                 <div
                   key={item.match_id}
-                  className="p-4 rounded-lg bg-white border border-[#CBD5E1] shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+                  className="p-4 rounded-lg bg-white dark:bg-slate-900/80 border border-[#CBD5E1] dark:border-slate-700 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
                 >
                   {/* Left: Outcome & Game */}
                   <div className="flex items-center gap-3">
@@ -456,11 +456,11 @@ export const ProfilePage: React.FC = () => {
                       {item.is_winner ? 'WON' : 'LOST'}
                     </Stamp>
                     <div>
-                      <h4 className="font-bold text-sm text-[#1E242B]">
+                      <h4 className="font-bold text-sm text-[#1E242B] dark:text-slate-100">
                         {formatGameName(item.game_type)}
                       </h4>
-                      <p className="font-mono text-xs text-[#64748B]">
-                        Room: <span className="font-bold">{item.room_code}</span> • vs @{item.opponent_username}
+                      <p className="font-mono text-xs text-[#64748B] dark:text-slate-400">
+                        Room: <span className="font-bold text-[#1A365D] dark:text-sky-300">{item.room_code}</span> • vs @{item.opponent_username}
                       </p>
                     </div>
                   </div>
@@ -468,17 +468,17 @@ export const ProfilePage: React.FC = () => {
                   {/* Right: Scores & ELO Delta */}
                   <div className="flex items-center gap-6 text-right w-full sm:w-auto justify-between sm:justify-end">
                     <div>
-                      <span className="text-[10px] font-mono text-[#64748B] uppercase block">Final Score</span>
-                      <span className="font-mono font-bold text-sm text-[#1E242B]">
+                      <span className="text-[10px] font-mono text-[#64748B] dark:text-slate-400 uppercase block">Final Score</span>
+                      <span className="font-mono font-bold text-sm text-[#1E242B] dark:text-slate-100">
                         {item.score} - {item.opponent_score}
                       </span>
                     </div>
 
-                    <div className="bg-[#F8FAFC] px-3 py-1.5 rounded border border-[#CBD5E1]">
-                      <span className="text-[10px] font-mono text-[#64748B] uppercase block">Rating Shift</span>
+                    <div className="bg-[#F8FAFC] dark:bg-slate-950/70 px-3 py-1.5 rounded border border-[#CBD5E1] dark:border-slate-700">
+                      <span className="text-[10px] font-mono text-[#64748B] dark:text-slate-400 uppercase block">Rating Shift</span>
                       <span
                         className={`font-mono font-black text-sm ${
-                          item.rating_delta >= 0 ? 'text-[#15803D]' : 'text-[#991B1B]'
+                          item.rating_delta >= 0 ? 'text-[#15803D] dark:text-emerald-400' : 'text-[#991B1B] dark:text-red-400'
                         }`}
                       >
                         {item.rating_delta >= 0 ? `+${item.rating_delta}` : item.rating_delta} ELO
@@ -510,8 +510,8 @@ export const ProfilePage: React.FC = () => {
                   key={ach.id}
                   className={`p-4 rounded-xl border-2 transition-all flex flex-col justify-between ${
                     ach.is_unlocked
-                      ? 'bg-[#FEF9C3] border-[#FDE047] shadow-[3px_3px_0px_0px_#854D0E]'
-                      : 'bg-white/80 border-[#CBD5E1] opacity-60'
+                      ? 'bg-[#FEF9C3] dark:bg-amber-950/70 border-[#FDE047] dark:border-amber-600 shadow-[3px_3px_0px_0px_#854D0E] dark:shadow-[3px_3px_0px_0px_#020617]'
+                      : 'bg-white/80 dark:bg-slate-900/60 border-[#CBD5E1] dark:border-slate-700 opacity-60'
                   }`}
                 >
                   <div>
@@ -521,14 +521,14 @@ export const ProfilePage: React.FC = () => {
                         {ach.is_unlocked ? 'UNLOCKED' : `${ach.points} PTS`}
                       </Stamp>
                     </div>
-                    <h4 className="font-bold text-sm text-[#1E242B]">{ach.name}</h4>
-                    <p className="font-hand text-xs text-[#475569] mt-1">{ach.description}</p>
+                    <h4 className="font-bold text-sm text-[#1E242B] dark:text-slate-100">{ach.name}</h4>
+                    <p className="font-hand text-xs text-[#475569] dark:text-slate-300 mt-1">{ach.description}</p>
                   </div>
 
                   {ach.is_unlocked && (
-                    <div className="mt-3 pt-2 border-t border-[#FDE047]/60 flex items-center justify-between text-[10px] font-mono text-[#854D0E]">
+                    <div className="mt-3 pt-2 border-t border-[#FDE047]/60 dark:border-amber-700/60 flex items-center justify-between text-[10px] font-mono text-[#854D0E] dark:text-amber-300">
                       <span>Awarded by Arbiter</span>
-                      <Check className="w-3.5 h-3.5 text-[#15803D]" />
+                      <Check className="w-3.5 h-3.5 text-[#15803D] dark:text-emerald-400" />
                     </div>
                   )}
                 </div>

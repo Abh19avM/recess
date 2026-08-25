@@ -300,7 +300,7 @@ export const Connect4ArenaPage: React.FC = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-16">
       {/* 1. Header Navigation */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] dark:border-slate-700 pb-4">
         <div className="flex items-center gap-3">
           <Link to="/games">
             <Button variant="secondary" size="sm" leftIcon={<ArrowLeft className="w-4 h-4" />}>
@@ -309,11 +309,11 @@ export const Connect4ArenaPage: React.FC = () => {
           </Link>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-extrabold text-[#1E242B]">Connect 4 Arena</h1>
+              <h1 className="text-2xl font-extrabold text-[#1E242B] dark:text-slate-100">Connect 4 Arena</h1>
               <Stamp tone="amber">6x7 VERTICAL GRID</Stamp>
             </div>
-            <p className="font-hand text-sm text-[#475569]">
-              Room: <span className="font-mono font-bold text-[#1A365D]">{targetRoom}</span> • Drop Discs to Connect 4 in a Row!
+            <p className="font-hand text-sm text-[#475569] dark:text-slate-300">
+              Room: <span className="font-mono font-bold text-[#1A365D] dark:text-sky-300">{targetRoom}</span> • Drop Discs to Connect 4 in a Row!
             </p>
           </div>
         </div>
@@ -335,11 +335,11 @@ export const Connect4ArenaPage: React.FC = () => {
           {!isBotMode && (
             <div className="flex items-center gap-1 text-xs font-mono">
               {status === 'OPEN' ? (
-                <span className="flex items-center gap-1 text-[#15803D] bg-[#DCFCE7] px-2 py-1 rounded border border-[#86EFAC]">
+                <span className="flex items-center gap-1 text-[#15803D] dark:text-emerald-300 bg-[#DCFCE7] dark:bg-emerald-950/60 px-2 py-1 rounded border border-[#86EFAC] dark:border-emerald-700/60">
                   <Wifi className="w-3.5 h-3.5" /> LIVE
                 </span>
               ) : (
-                <span className="flex items-center gap-1 text-[#991B1B] bg-[#FFE4E6] px-2 py-1 rounded border border-[#FECDD3]">
+                <span className="flex items-center gap-1 text-[#991B1B] dark:text-red-300 bg-[#FFE4E6] dark:bg-red-950/60 px-2 py-1 rounded border border-[#FECDD3] dark:border-red-700/60">
                   <WifiOff className="w-3.5 h-3.5" /> OFFLINE
                 </span>
               )}
@@ -355,7 +355,7 @@ export const Connect4ArenaPage: React.FC = () => {
           {/* Turn Banner */}
           <PaperCard variant="sticky" stickyColor="yellow" showTape className="p-3 text-center">
             {isBotMode ? (
-              <div className="font-hand text-lg font-bold text-[#1A365D]">
+              <div className="font-hand text-lg font-bold text-[#1A365D] dark:text-amber-200">
                 {botWinnerMsg
                   ? botWinnerMsg
                   : botTurn === 'player'
@@ -365,12 +365,12 @@ export const Connect4ArenaPage: React.FC = () => {
             ) : gameState?.status === 'active' ? (
               <div className="flex items-center justify-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-[#15803D] animate-ping" />
-                <span className="font-hand text-xl font-bold text-[#1A365D]">
+                <span className="font-hand text-xl font-bold text-[#1A365D] dark:text-amber-200">
                   {isMyTurn ? '🔵 Your Turn! Click any column arrow to drop disc.' : `⏳ Waiting for @${otherMember?.username || 'Opponent'}...`}
                 </span>
               </div>
             ) : gameState?.status === 'finished' ? (
-              <div className="font-hand text-xl font-bold text-[#991B1B]">
+              <div className="font-hand text-xl font-bold text-[#991B1B] dark:text-red-300">
                 {gameState.result?.is_draw
                   ? '🤝 Match Ended in a Draw (Board Full)!'
                   : gameState.result?.winner_id === user?.id
@@ -378,7 +378,7 @@ export const Connect4ArenaPage: React.FC = () => {
                   : '🔴 Opponent Connected 4! Good game.'}
               </div>
             ) : (
-              <div className="font-hand text-base text-[#475569]">
+              <div className="font-hand text-base text-[#475569] dark:text-amber-100">
                 {members.length < 2
                   ? `Invite a classmate to join code "${targetRoom}"`
                   : 'Both players must toggle "Ready Up" to start.'}
@@ -387,7 +387,7 @@ export const Connect4ArenaPage: React.FC = () => {
           </PaperCard>
 
           {/* Connect 4 Vertical Board Frame */}
-          <PaperCard variant="plain" className="p-6 sm:p-8 flex flex-col items-center justify-center relative select-none bg-[#FDFBF7]">
+          <PaperCard variant="plain" className="p-6 sm:p-8 flex flex-col items-center justify-center relative select-none bg-[#FDFBF7] dark:bg-slate-900/90">
             {/* Top Column Drop Indicators */}
             <div className="grid grid-cols-7 gap-2 sm:gap-3 w-full max-w-md mb-2">
               {Array.from({ length: 7 }).map((_, c) => (
@@ -403,8 +403,8 @@ export const Connect4ArenaPage: React.FC = () => {
                   }
                   className={`h-8 rounded-t-lg flex items-center justify-center transition-all cursor-pointer ${
                     hoveredCol === c
-                      ? 'bg-[#1A365D] text-white shadow-xs -translate-y-0.5'
-                      : 'bg-transparent text-[#94A3B8] hover:text-[#1A365D]'
+                      ? 'bg-[#1A365D] dark:bg-sky-600 text-white shadow-xs -translate-y-0.5'
+                      : 'bg-transparent text-[#94A3B8] hover:text-[#1A365D] dark:hover:text-sky-400'
                   }`}
                 >
                   <ChevronDown className="w-5 h-5 animate-bounce" />
@@ -413,7 +413,7 @@ export const Connect4ArenaPage: React.FC = () => {
             </div>
 
             {/* 6x7 Grid Board Box */}
-            <div className="bg-[#1A365D] p-3 sm:p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0F172A] border-4 border-[#0F172A] inline-block">
+            <div className="bg-[#1A365D] dark:bg-[#0F2238] p-3 sm:p-4 rounded-2xl shadow-[6px_6px_0px_0px_#0F172A] dark:shadow-[6px_6px_0px_0px_#020617] border-4 border-[#0F172A] dark:border-slate-800 inline-block">
               <div className="grid grid-cols-7 gap-2 sm:gap-3">
                 {Array.from({ length: 6 }).map((_, r) =>
                   Array.from({ length: 7 }).map((_, c) => {
@@ -433,7 +433,7 @@ export const Connect4ArenaPage: React.FC = () => {
                             ? isPlayer
                               ? 'bg-[#0284C7] shadow-[inset_0_3px_6px_rgba(255,255,255,0.4),0_3px_6px_rgba(0,0,0,0.3)]'
                               : 'bg-[#DC2626] shadow-[inset_0_3px_6px_rgba(255,255,255,0.4),0_3px_6px_rgba(0,0,0,0.3)]'
-                            : 'bg-[#F8FAFC] shadow-[inset_0_4px_6px_rgba(0,0,0,0.4)] hover:bg-[#E2E8F0]'
+                            : 'bg-[#F8FAFC] dark:bg-slate-950 shadow-[inset_0_4px_6px_rgba(0,0,0,0.5)] hover:bg-[#E2E8F0] dark:hover:bg-slate-900'
                         } ${isWin ? 'ring-4 ring-[#FDE047] ring-offset-2 ring-offset-[#1A365D] animate-pulse scale-105' : ''}`}
                       >
                         {isOccupied && (
@@ -457,7 +457,7 @@ export const Connect4ArenaPage: React.FC = () => {
                     className="w-full"
                     leftIcon={<RotateCcw className="w-4 h-4" />}
                   >
-                    Play Rematch Round
+                    Play Rematch
                   </Button>
                 ) : (
                   <Button
@@ -466,7 +466,7 @@ export const Connect4ArenaPage: React.FC = () => {
                     size="md"
                     className="w-full"
                   >
-                    {isReady ? '✓ Ready (Waiting for Opponent)' : 'Ready Up to Play'}
+                    {isReady ? '✓ Ready (Waiting)' : 'Ready Up'}
                   </Button>
                 )
               ) : (
@@ -488,24 +488,24 @@ export const Connect4ArenaPage: React.FC = () => {
         <div className="lg:col-span-5 space-y-4">
           {/* Players Bench */}
           <PaperCard variant="ruled" className="p-5">
-            <div className="flex items-center justify-between pb-3 border-b border-[#CBD5E1] mb-3">
+            <div className="flex items-center justify-between pb-3 border-b border-[#CBD5E1] dark:border-slate-700/60 mb-3">
               <div className="flex items-center gap-2">
-                <Users className="w-4 h-4 text-[#1A365D]" />
-                <h3 className="font-bold text-sm text-[#1E242B]">Classroom Bench</h3>
+                <Users className="w-4 h-4 text-[#1A365D] dark:text-sky-400" />
+                <h3 className="font-bold text-sm text-[#1E242B] dark:text-slate-100">Classroom Bench</h3>
               </div>
               <Stamp tone="blue">{members.length}/2 SEATED</Stamp>
             </div>
 
             <div className="space-y-3">
               {/* Player 1 (You) */}
-              <div className="flex items-center justify-between p-2.5 rounded bg-white border border-[#CBD5E1] shadow-2xs">
+              <div className="flex items-center justify-between p-2.5 rounded bg-white dark:bg-slate-900/80 border border-[#CBD5E1] dark:border-slate-700 shadow-2xs">
                 <div className="flex items-center gap-2.5">
                   <Avatar username={user?.username || 'You'} size="sm" isOnline />
                   <div>
-                    <p className="text-xs font-bold text-[#1E242B]">
-                      @{user?.username || 'You'} <span className="text-[#1A365D]">(You)</span>
+                    <p className="text-xs font-bold text-[#1E242B] dark:text-slate-100">
+                      @{user?.username || 'You'} <span className="text-[#1A365D] dark:text-sky-300">(You)</span>
                     </p>
-                    <span className="font-hand text-sm text-[#0284C7] font-bold">
+                    <span className="font-hand text-sm text-[#0284C7] dark:text-sky-400 font-bold">
                       Discs: Blue Ink Disc
                     </span>
                   </div>
@@ -516,7 +516,7 @@ export const Connect4ArenaPage: React.FC = () => {
               </div>
 
               {/* Player 2 (Opponent) */}
-              <div className="flex items-center justify-between p-2.5 rounded bg-white border border-[#CBD5E1] shadow-2xs">
+              <div className="flex items-center justify-between p-2.5 rounded bg-white dark:bg-slate-900/80 border border-[#CBD5E1] dark:border-slate-700 shadow-2xs">
                 <div className="flex items-center gap-2.5">
                   <Avatar
                     username={otherMember?.username || (isBotMode ? 'ClassBot' : 'Waiting...')}
@@ -524,10 +524,10 @@ export const Connect4ArenaPage: React.FC = () => {
                     isOnline={!!otherMember || isBotMode}
                   />
                   <div>
-                    <p className="text-xs font-bold text-[#1E242B]">
+                    <p className="text-xs font-bold text-[#1E242B] dark:text-slate-100">
                       {isBotMode ? 'ClassBot (AI)' : otherMember ? `@${otherMember.username}` : 'Empty Desk...'}
                     </p>
-                    <span className="font-hand text-sm text-[#DC2626] font-bold">
+                    <span className="font-hand text-sm text-[#DC2626] dark:text-red-400 font-bold">
                       Discs: Red Ink Disc
                     </span>
                   </div>
@@ -541,37 +541,37 @@ export const Connect4ArenaPage: React.FC = () => {
 
           {/* Desk Notes Chat */}
           <PaperCard variant="plain" className="p-4 flex flex-col h-64">
-            <h4 className="font-bold text-xs uppercase tracking-wider text-[#1E242B] font-mono mb-2 pb-1 border-b border-[#CBD5E1]">
+            <h4 className="font-bold text-xs uppercase tracking-wider text-[#1E242B] dark:text-slate-100 font-mono mb-2 pb-1 border-b border-[#CBD5E1] dark:border-slate-700">
               Pass Desk Notes:
             </h4>
 
             {/* Note log */}
             <div className="flex-1 overflow-y-auto space-y-2 pr-1 text-xs">
               {deskNotes.length === 0 ? (
-                <p className="text-[#94A3B8] font-hand text-sm text-center py-6">
+                <p className="text-[#94A3B8] dark:text-slate-400 font-hand text-sm text-center py-6">
                   No notes passed yet. Whisper something to your benchmate!
                 </p>
               ) : (
                 deskNotes.map((note, idx) => (
-                  <div key={idx} className="bg-[#FEF9C3] p-2 rounded border border-[#FDE047] text-left">
-                    <div className="flex items-center justify-between text-[10px] text-[#854D0E] font-mono font-bold">
+                  <div key={idx} className="bg-[#FEF9C3] dark:bg-amber-950/40 p-2 rounded border border-[#FDE047] dark:border-amber-700/60 text-left">
+                    <div className="flex items-center justify-between text-[10px] text-[#854D0E] dark:text-amber-300 font-mono font-bold">
                       <span>@{note.sender}</span>
                       <span>{note.time}</span>
                     </div>
-                    <p className="font-hand text-sm text-[#1E242B] mt-0.5">{note.text}</p>
+                    <p className="font-hand text-sm text-[#1E242B] dark:text-amber-100 mt-0.5">{note.text}</p>
                   </div>
                 ))
               )}
             </div>
 
             {/* Note Input */}
-            <form onSubmit={handleSendNote} className="flex gap-2 pt-2 mt-2 border-t border-[#CBD5E1]">
+            <form onSubmit={handleSendNote} className="flex gap-2 pt-2 mt-2 border-t border-[#CBD5E1] dark:border-slate-700">
               <input
                 type="text"
                 placeholder="Whisper a quick note..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                className="flex-1 px-2.5 py-1.5 text-xs bg-white rounded border border-[#94A3B8] outline-none"
+                className="flex-1 px-2.5 py-1.5 text-xs bg-white dark:bg-slate-900 text-[#1E242B] dark:text-slate-100 rounded border border-[#94A3B8] dark:border-slate-700 outline-none"
               />
               <Button type="submit" variant="primary" size="sm">
                 <Send className="w-3.5 h-3.5" />

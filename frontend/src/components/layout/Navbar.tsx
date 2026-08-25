@@ -38,19 +38,19 @@ export const Navbar: React.FC = () => {
           {/* Logo */}
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center gap-2 group">
-              <div className="w-9 h-9 rounded bg-[#1A365D] text-white flex items-center justify-center font-bold text-lg border-2 border-[#0F2238] shadow-[2px_2px_0px_0px_#0F2238] group-hover:-translate-y-0.5 transition-transform">
+              <div className="w-9 h-9 rounded bg-[#1A365D] dark:bg-sky-900 text-white flex items-center justify-center font-bold text-lg border-2 border-[#0F2238] dark:border-sky-700 shadow-[2px_2px_0px_0px_#0F2238] dark:shadow-[2px_2px_0px_0px_#020617] group-hover:-translate-y-0.5 transition-transform">
                 <span className="font-hand text-xl">R</span>
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-xl tracking-tight text-[#1E242B]">
+                  <span className="font-bold text-xl tracking-tight text-[#1E242B] dark:text-slate-100">
                     RECESS
                   </span>
                   <Stamp tone="amber" className="hidden sm:inline-flex text-[10px] py-0 px-1.5">
                     BELL ON
                   </Stamp>
                 </div>
-                <span className="text-[10px] font-mono text-[#475569] tracking-wider uppercase -mt-1 hidden sm:block">
+                <span className="text-[10px] font-mono text-[#475569] dark:text-slate-400 tracking-wider uppercase -mt-1 hidden sm:block">
                   Classic Schoolyard Games
                 </span>
               </div>
@@ -66,8 +66,8 @@ export const Navbar: React.FC = () => {
                     to={link.path}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-semibold transition-all ${
                       isActive
-                        ? 'bg-[#1A365D] text-white border border-[#0F2238] shadow-[2px_2px_0px_0px_#0F2238]'
-                        : 'text-[#475569] hover:bg-[#F2EDE0] hover:text-[#1E242B]'
+                        ? 'bg-[#1A365D] dark:bg-sky-800 text-white border border-[#0F2238] dark:border-sky-700 shadow-[2px_2px_0px_0px_#0F2238] dark:shadow-[2px_2px_0px_0px_#020617]'
+                        : 'text-[#475569] dark:text-slate-300 hover:bg-[#F2EDE0] dark:hover:bg-slate-800 hover:text-[#1E242B] dark:hover:text-slate-100'
                     }`}
                   >
                     {link.icon}
@@ -84,7 +84,7 @@ export const Navbar: React.FC = () => {
             <button
               type="button"
               onClick={toggleTheme}
-              className="p-1.5 rounded-md border-2 border-[#CBD5E1] dark:border-[#334155] bg-[#FBF9F3] dark:bg-[#15201A] text-[#1E242B] dark:text-[#F1F5F9] hover:bg-[#F2EDE0] dark:hover:bg-[#1F2E25] transition-all shadow-[2px_2px_0px_0px_#1E242B] dark:shadow-[2px_2px_0px_0px_#000000] flex items-center gap-1.5 text-xs font-mono"
+              className="p-1.5 rounded-md border-2 border-[#CBD5E1] dark:border-slate-700 bg-[#FBF9F3] dark:bg-slate-900 text-[#1E242B] dark:text-slate-100 hover:bg-[#F2EDE0] dark:hover:bg-slate-800 transition-all shadow-[2px_2px_0px_0px_#1E242B] dark:shadow-[2px_2px_0px_0px_#020617] flex items-center gap-1.5 text-xs font-mono cursor-pointer"
               title={theme === 'dark' ? 'Switch to Day Class ☀️' : 'Switch to Night Chalkboard 🌙'}
               aria-label="Toggle Chalkboard Dark Mode"
             >
@@ -105,14 +105,14 @@ export const Navbar: React.FC = () => {
               <div className="flex items-center gap-2 sm:gap-3">
                 <Link
                   to="/profile"
-                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#FBF9F3] dark:bg-[#15201A] border-2 border-[#CBD5E1] dark:border-[#334155] hover:border-[#1A365D] transition-colors shadow-xs"
+                  className="flex items-center gap-2 px-2.5 py-1.5 rounded-md bg-[#FBF9F3] dark:bg-slate-900 border-2 border-[#CBD5E1] dark:border-slate-700 hover:border-[#1A365D] dark:hover:border-sky-500 transition-colors shadow-xs"
                 >
                   <Avatar username={user.username} preset={user.avatar_preset} size="sm" isOnline />
                   <div className="text-left hidden sm:block">
-                    <p className="text-xs font-bold text-[#1E242B] dark:text-[#F1F5F9] leading-none">
+                    <p className="text-xs font-bold text-[#1E242B] dark:text-slate-100 leading-none">
                       {user.username}
                     </p>
-                    <p className="text-[10px] font-mono text-[#15803D] dark:text-[#86EFAC] font-semibold">
+                    <p className="text-[10px] font-mono text-[#15803D] dark:text-emerald-400 font-semibold">
                       {user.rating} ELO {user.is_guest && '(Guest)'}
                     </p>
                   </div>
@@ -123,7 +123,7 @@ export const Navbar: React.FC = () => {
                   variant="ghost"
                   size="sm"
                   aria-label="Logout"
-                  className="text-[#475569] dark:text-[#94A3B8] hover:text-[#991B1B]"
+                  className="text-[#475569] dark:text-slate-400 hover:text-[#991B1B] dark:hover:text-red-400"
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>

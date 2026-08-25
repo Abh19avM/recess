@@ -55,21 +55,21 @@ export const LoginPage: React.FC = () => {
       <PaperCard variant="ruled" className="p-8 sm:p-10 relative">
         {/* Top Stamp */}
         <div className="flex items-center justify-between mb-4">
-          <span className="font-hand text-xl text-[#1A365D] font-bold">Class Attendance</span>
+          <span className="font-hand text-xl text-[#1A365D] dark:text-sky-300 font-bold">Class Attendance</span>
           <Stamp tone="blue">ROLL CALL</Stamp>
         </div>
 
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B] tracking-tight">
+        <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B] dark:text-slate-100 tracking-tight">
           {isGuestMode ? 'Instant Guest Pass' : 'Student Sign In'}
         </h2>
-        <p className="font-hand text-base text-[#475569] mt-0.5">
+        <p className="font-hand text-base text-[#475569] dark:text-slate-300 mt-0.5">
           {isGuestMode
             ? 'Jump straight into games without registration.'
             : 'Enter your classroom handle and passcode.'}
         </p>
 
         {/* Tab switcher */}
-        <div className="flex rounded-md border border-[#CBD5E1] p-1 bg-[#F2EDE0] my-6">
+        <div className="flex rounded-md border border-[#CBD5E1] dark:border-slate-700 p-1 bg-[#F2EDE0] dark:bg-slate-900/80 my-6">
           <button
             type="button"
             onClick={() => {
@@ -78,8 +78,8 @@ export const LoginPage: React.FC = () => {
             }}
             className={`flex-1 py-1.5 text-xs font-bold rounded transition-all ${
               !isGuestMode
-                ? 'bg-white text-[#1A365D] shadow-xs border border-[#CBD5E1]'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-white dark:bg-slate-800 text-[#1A365D] dark:text-sky-300 shadow-xs border border-[#CBD5E1] dark:border-slate-600'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             Registered Student
@@ -92,11 +92,11 @@ export const LoginPage: React.FC = () => {
             }}
             className={`flex-1 py-1.5 text-xs font-bold rounded transition-all flex items-center justify-center gap-1 ${
               isGuestMode
-                ? 'bg-white text-[#B45309] shadow-xs border border-[#CBD5E1]'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-white dark:bg-slate-800 text-[#B45309] dark:text-amber-300 shadow-xs border border-[#CBD5E1] dark:border-slate-600'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
-            <Sparkles className="w-3 h-3 text-[#B45309]" />
+            <Sparkles className="w-3 h-3 text-[#B45309] dark:text-amber-400" />
             Guest Pass
           </button>
         </div>

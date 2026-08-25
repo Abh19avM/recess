@@ -150,25 +150,25 @@ export const GamesPage: React.FC = () => {
   return (
     <div className="space-y-8 pb-12">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b-2 border-[#1E242B] dark:border-slate-700 pb-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-extrabold text-[#1E242B]">Classroom Games Syllabus</h1>
+            <h1 className="text-3xl font-extrabold text-[#1E242B] dark:text-slate-100">Classroom Games Syllabus</h1>
             <Stamp tone="blue">OFFICIAL RULES</Stamp>
           </div>
-          <p className="font-hand text-lg text-[#475569] mt-0.5">
+          <p className="font-hand text-lg text-[#475569] dark:text-slate-300 mt-0.5">
             Full game rules, mechanics, and strategies for all 6 classic schoolyard competitions.
           </p>
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center gap-1 bg-[#F2EDE0] p-1 rounded-md border border-[#CBD5E1] text-xs font-bold">
+        <div className="flex items-center gap-1 bg-[#F2EDE0] dark:bg-slate-900/80 p-1 rounded-md border border-[#CBD5E1] dark:border-slate-700 text-xs font-bold">
           <button
             onClick={() => setFilter('all')}
             className={`px-3 py-1.5 rounded transition-all ${
               filter === 'all'
-                ? 'bg-white text-[#1A365D] shadow-xs border border-[#CBD5E1]'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-white dark:bg-slate-800 text-[#1A365D] dark:text-sky-300 shadow-xs border border-[#CBD5E1] dark:border-slate-600'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             All 6 Games
@@ -177,8 +177,8 @@ export const GamesPage: React.FC = () => {
             onClick={() => setFilter('2p')}
             className={`px-3 py-1.5 rounded transition-all ${
               filter === '2p'
-                ? 'bg-white text-[#1A365D] shadow-xs border border-[#CBD5E1]'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-white dark:bg-slate-800 text-[#1A365D] dark:text-sky-300 shadow-xs border border-[#CBD5E1] dark:border-slate-600'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             2-Player
@@ -187,8 +187,8 @@ export const GamesPage: React.FC = () => {
             onClick={() => setFilter('turn')}
             className={`px-3 py-1.5 rounded transition-all ${
               filter === 'turn'
-                ? 'bg-white text-[#1A365D] shadow-xs border border-[#CBD5E1]'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-white dark:bg-slate-800 text-[#1A365D] dark:text-sky-300 shadow-xs border border-[#CBD5E1] dark:border-slate-600'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             Turn-Based
@@ -197,8 +197,8 @@ export const GamesPage: React.FC = () => {
             onClick={() => setFilter('strategy')}
             className={`px-3 py-1.5 rounded transition-all ${
               filter === 'strategy'
-                ? 'bg-white text-[#1A365D] shadow-xs border border-[#CBD5E1]'
-                : 'text-[#475569] hover:text-[#1E242B]'
+                ? 'bg-white dark:bg-slate-800 text-[#1A365D] dark:text-sky-300 shadow-xs border border-[#CBD5E1] dark:border-slate-600'
+                : 'text-[#475569] dark:text-slate-400 hover:text-[#1E242B] dark:hover:text-slate-200'
             }`}
           >
             Tactical Strategy
@@ -207,19 +207,19 @@ export const GamesPage: React.FC = () => {
       </div>
 
       {/* Sideline Spectator Live Bar */}
-      <div className="bg-white border-2 border-[#4A6B82]/30 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
+      <div className="bg-white dark:bg-[#141C2E] border-2 border-[#4A6B82]/30 dark:border-slate-700 rounded-2xl p-4 sm:p-5 shadow-md flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-100 border border-red-300 flex items-center justify-center text-red-600">
+          <div className="w-10 h-10 rounded-xl bg-red-100 dark:bg-red-950/60 border border-red-300 dark:border-red-800 flex items-center justify-center text-red-600 dark:text-red-400">
             <Radio className="w-5 h-5 animate-pulse" />
           </div>
           <div>
-            <h3 className="font-bold text-sm text-[#2C3E50] flex items-center gap-2">
+            <h3 className="font-bold text-sm text-[#2C3E50] dark:text-slate-100 flex items-center gap-2">
               Schoolyard Sideline Spectate
-              <span className="text-[10px] px-2 py-0.5 bg-red-100 text-red-700 font-extrabold rounded-full">
+              <span className="text-[10px] px-2 py-0.5 bg-red-100 dark:bg-red-900/60 text-red-700 dark:text-red-300 font-extrabold rounded-full border border-red-200 dark:border-red-700">
                 LIVE
               </span>
             </h3>
-            <p className="font-hand text-xs text-[#475569]">
+            <p className="font-hand text-xs text-[#475569] dark:text-slate-300">
               Watch any active desk duel in real time as a bystander without making moves.
             </p>
           </div>
@@ -231,7 +231,7 @@ export const GamesPage: React.FC = () => {
             value={spectateRoomId}
             onChange={(e) => setSpectateRoomId(e.target.value)}
             placeholder="Enter Room Code (e.g. RECESS-XO)"
-            className="px-3.5 py-2 text-xs font-mono bg-[#FBF9F1] border-2 border-[#4A6B82]/30 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#4A6B82]/40 w-full sm:w-64"
+            className="px-3.5 py-2 text-xs font-mono bg-[#FBF9F1] dark:bg-slate-900/90 text-[#1E242B] dark:text-slate-100 border-2 border-[#4A6B82]/30 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-sky-500/40 w-full sm:w-64"
           />
           <Button
             type="submit"
@@ -251,15 +251,15 @@ export const GamesPage: React.FC = () => {
           <PaperCard
             key={game.id}
             variant={game.paperVariant}
-            className="p-6 sm:p-8 flex flex-col justify-between"
+            className="p-6 sm:p-8 flex flex-col justify-between hover:shadow-[5px_5px_0px_0px_#1E242B] dark:hover:shadow-[5px_5px_0px_0px_#020617] transition-all"
           >
             <div>
               <div className="flex items-start justify-between gap-3 mb-2">
                 <div className="flex items-center gap-3">
                   <span className="text-4xl">{game.icon}</span>
                   <div>
-                    <h3 className="text-2xl font-bold text-[#1E242B]">{game.title}</h3>
-                    <p className="font-hand text-base text-[#1A365D]">{game.tagline}</p>
+                    <h3 className="text-2xl font-bold text-[#1E242B] dark:text-slate-100">{game.title}</h3>
+                    <p className="font-hand text-base text-[#1A365D] dark:text-sky-300/90">{game.tagline}</p>
                   </div>
                 </div>
                 <Stamp tone="green">VERIFIED</Stamp>
@@ -282,12 +282,12 @@ export const GamesPage: React.FC = () => {
               </div>
 
               {/* Rules List */}
-              <div className="bg-[#F8FAFC]/90 p-4 rounded-md border border-[#CBD5E1] my-4 space-y-2">
-                <h4 className="font-bold text-xs uppercase tracking-wider text-[#1E242B] font-mono flex items-center gap-1.5">
-                  <BookOpen className="w-3.5 h-3.5 text-[#1A365D]" />
+              <div className="bg-[#F8FAFC]/90 dark:bg-slate-900/70 p-4 rounded-md border border-[#CBD5E1] dark:border-slate-700/70 my-4 space-y-2">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-[#1E242B] dark:text-slate-200 font-mono flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-[#1A365D] dark:text-sky-400" />
                   Rules & Mechanics:
                 </h4>
-                <ul className="space-y-1 text-xs text-[#475569] list-disc list-inside leading-relaxed">
+                <ul className="space-y-1 text-xs text-[#475569] dark:text-slate-300 list-disc list-inside leading-relaxed">
                   {game.rules.map((rule, idx) => (
                     <li key={idx}>
                       <span>{rule}</span>
@@ -297,9 +297,9 @@ export const GamesPage: React.FC = () => {
               </div>
 
               {/* Pro Tip Callout */}
-              <div className="p-3 rounded bg-[#FEF9C3]/80 border border-[#FDE047] text-xs">
-                <p className="font-hand text-sm text-[#854D0E]">
-                  <strong className="font-bold">Back-Bench Secret:</strong> {game.proTip}
+              <div className="p-3 rounded bg-[#FEF9C3]/80 dark:bg-amber-950/40 border border-[#FDE047] dark:border-amber-700/60 text-xs">
+                <p className="font-hand text-sm text-[#854D0E] dark:text-amber-200">
+                  <strong className="font-bold text-[#713F12] dark:text-amber-300">Back-Bench Secret:</strong> {game.proTip}
                 </p>
               </div>
             </div>

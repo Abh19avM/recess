@@ -124,7 +124,7 @@ export const LandingPage: React.FC = () => {
           className="p-8 sm:p-12 relative overflow-hidden"
         >
           {/* Main Pinned Paper Poster in center of notice board */}
-          <div className="relative bg-[#FFFFFF] rounded-md p-6 sm:p-10 border-2 border-[#1E242B] shadow-[4px_4px_0px_0px_#1E242B] max-w-4xl mx-auto text-center">
+          <div className="relative bg-white dark:bg-[#141C2E] rounded-md p-6 sm:p-10 border-2 border-[#1E242B] dark:border-slate-700 shadow-[4px_4px_0px_0px_#1E242B] dark:shadow-[4px_4px_0px_0px_#020617] max-w-4xl mx-auto text-center">
             {/* Top center push-pin */}
             <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
               <div className="push-pin-red" />
@@ -135,14 +135,14 @@ export const LandingPage: React.FC = () => {
               <Stamp tone="red">RECESS PERIOD IS ACTIVE</Stamp>
             </div>
 
-            <h1 className="text-3xl sm:text-5xl font-extrabold text-[#1E242B] tracking-tight leading-tight">
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-[#1E242B] dark:text-slate-100 tracking-tight leading-tight">
               Classroom Multiplayer Games, <br />
-              <span className="font-hand text-4xl sm:text-6xl text-[#1A365D] underline decoration-[#991B1B]/40 decoration-wavy">
+              <span className="font-hand text-4xl sm:text-6xl text-[#1A365D] dark:text-sky-300 underline decoration-[#991B1B]/40 dark:decoration-red-500/40 decoration-wavy">
                 Recreated for Back-Benchers.
               </span>
             </h1>
 
-            <p className="font-sans text-base sm:text-lg text-[#475569] max-w-2xl mx-auto mt-4 leading-relaxed">
+            <p className="font-sans text-base sm:text-lg text-[#475569] dark:text-slate-300 max-w-2xl mx-auto mt-4 leading-relaxed">
               No generic mini-games. No cartoon nonsense. Pure server-authoritative multiplayer
               with real-time WebSockets, Elo rankings, and authentic school stationery aesthetics.
             </p>
@@ -181,21 +181,21 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {/* Schoolyard Trust Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-8 mt-8 border-t border-[#E2E8F0] text-xs font-mono text-[#475569]">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-8 mt-8 border-t border-[#E2E8F0] dark:border-slate-700/60 text-xs font-mono text-[#475569] dark:text-slate-300">
               <div className="flex items-center justify-center gap-1.5">
-                <Zap className="w-4 h-4 text-[#15803D]" />
+                <Zap className="w-4 h-4 text-[#15803D] dark:text-emerald-400" />
                 <span>&lt;20ms WebSockets</span>
               </div>
               <div className="flex items-center justify-center gap-1.5">
-                <ShieldCheck className="w-4 h-4 text-[#1A365D]" />
+                <ShieldCheck className="w-4 h-4 text-[#1A365D] dark:text-sky-400" />
                 <span>Anti-Cheat Authoritative</span>
               </div>
               <div className="flex items-center justify-center gap-1.5">
-                <RotateCcw className="w-4 h-4 text-[#B45309]" />
+                <RotateCcw className="w-4 h-4 text-[#B45309] dark:text-amber-400" />
                 <span>Instant Reconnects</span>
               </div>
               <div className="flex items-center justify-center gap-1.5">
-                <Trophy className="w-4 h-4 text-[#991B1B]" />
+                <Trophy className="w-4 h-4 text-[#991B1B] dark:text-red-400" />
                 <span>Ranked Elo Matchmaking</span>
               </div>
             </div>
@@ -205,15 +205,15 @@ export const LandingPage: React.FC = () => {
 
       {/* 2. Featured School Games Catalog */}
       <section className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-2 border-[#1E242B] pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b-2 border-[#1E242B] dark:border-slate-700 pb-3">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B]">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B] dark:text-slate-100">
                 The 6 Schoolyard Classics
               </h2>
               <Stamp tone="blue">OFFICIAL SYLLABUS</Stamp>
             </div>
-            <p className="font-hand text-lg text-[#475569]">
+            <p className="font-hand text-lg text-[#475569] dark:text-slate-300">
               Pick your game, challenge a classmate, or hop into ranked matchmaking.
             </p>
           </div>
@@ -229,7 +229,7 @@ export const LandingPage: React.FC = () => {
             <PaperCard
               key={game.id}
               variant={game.paperType}
-              className="flex flex-col justify-between hover:shadow-[5px_5px_0px_0px_#1E242B] transition-all group cursor-pointer"
+              className="flex flex-col justify-between hover:shadow-[5px_5px_0px_0px_#1E242B] dark:hover:shadow-[5px_5px_0px_0px_#020617] transition-all group cursor-pointer"
               onClick={() => navigate(`/games`)}
             >
               <div>
@@ -238,17 +238,17 @@ export const LandingPage: React.FC = () => {
                   <Stamp tone={game.stampTone}>{game.stampText}</Stamp>
                 </div>
 
-                <h3 className="text-xl font-bold text-[#1E242B] group-hover:text-[#1A365D] transition-colors">
+                <h3 className="text-xl font-bold text-[#1E242B] dark:text-slate-100 group-hover:text-[#1A365D] group-hover:dark:text-sky-300 transition-colors">
                   {game.title}
                 </h3>
-                <p className="font-hand text-base text-[#1A365D] mt-0.5">{game.tagline}</p>
+                <p className="font-hand text-base text-[#1A365D] dark:text-sky-300/90 mt-0.5">{game.tagline}</p>
 
-                <p className="text-xs text-[#475569] mt-3 leading-relaxed bg-[#F8FAFC]/80 p-2.5 rounded border border-[#E2E8F0]">
-                  <strong className="text-[#1E242B]">How to play:</strong> {game.rules}
+                <p className="text-xs text-[#475569] dark:text-slate-300 mt-3 leading-relaxed bg-[#F8FAFC]/90 dark:bg-slate-900/60 p-2.5 rounded border border-[#E2E8F0] dark:border-slate-700/60">
+                  <strong className="text-[#1E242B] dark:text-amber-300">How to play:</strong> {game.rules}
                 </p>
               </div>
 
-              <div className="pt-4 mt-4 border-t border-[#CBD5E1] flex items-center justify-between text-xs font-mono">
+              <div className="pt-4 mt-4 border-t border-[#CBD5E1] dark:border-slate-700/60 flex items-center justify-between text-xs font-mono">
                 <div className="flex items-center gap-2">
                   <Badge variant="default" size="sm">
                     {game.players}
@@ -257,7 +257,7 @@ export const LandingPage: React.FC = () => {
                     {game.duration}
                   </Badge>
                 </div>
-                <span className="font-bold text-[#1A365D] group-hover:translate-x-1 transition-transform">
+                <span className="font-bold text-[#1A365D] dark:text-sky-400 group-hover:text-blue-700 group-hover:dark:text-sky-300 group-hover:translate-x-1 transition-all">
                   Enter Arena →
                 </span>
               </div>
@@ -273,43 +273,43 @@ export const LandingPage: React.FC = () => {
             <Stamp tone="green" className="mb-2">
               DESK PROTOCOL
             </Stamp>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B]">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#1E242B] dark:text-slate-100">
               How To Start A Rivalry In 3 Steps
             </h2>
-            <p className="font-hand text-lg text-[#475569] mt-1">
+            <p className="font-hand text-lg text-[#475569] dark:text-slate-300 mt-1">
               Zero downloads. Zero installs. Works instantly on mobile and desktop browsers.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8">
               {/* Step 1 */}
               <div className="space-y-2">
-                <div className="w-9 h-9 rounded-full bg-[#1A365D] text-white flex items-center justify-center font-bold text-base border-2 border-[#0F2238]">
+                <div className="w-9 h-9 rounded-full bg-[#1A365D] dark:bg-sky-900 text-white flex items-center justify-center font-bold text-base border-2 border-[#0F2238] dark:border-sky-700">
                   1
                 </div>
-                <h4 className="font-bold text-base text-[#1E242B]">Pick Your Game</h4>
-                <p className="text-xs text-[#475569] leading-relaxed">
+                <h4 className="font-bold text-base text-[#1E242B] dark:text-slate-100">Pick Your Game</h4>
+                <p className="text-xs text-[#475569] dark:text-slate-300 leading-relaxed">
                   Choose from Hand Cricket, Dots & Boxes, XO, Connect 4, Paper Football, or NPAT.
                 </p>
               </div>
 
               {/* Step 2 */}
               <div className="space-y-2">
-                <div className="w-9 h-9 rounded-full bg-[#15803D] text-white flex items-center justify-center font-bold text-base border-2 border-[#14532D]">
+                <div className="w-9 h-9 rounded-full bg-[#15803D] dark:bg-emerald-900 text-white flex items-center justify-center font-bold text-base border-2 border-[#14532D] dark:border-emerald-700">
                   2
                 </div>
-                <h4 className="font-bold text-base text-[#1E242B]">Share Room Code</h4>
-                <p className="text-xs text-[#475569] leading-relaxed">
-                  Generate a clean custom code like <code className="font-mono text-[11px] bg-[#F2EDE0] px-1 py-0.5 rounded">RECESS-7X9P</code> and text it to your friend.
+                <h4 className="font-bold text-base text-[#1E242B] dark:text-slate-100">Share Room Code</h4>
+                <p className="text-xs text-[#475569] dark:text-slate-300 leading-relaxed">
+                  Generate a clean custom code like <code className="font-mono text-[11px] bg-[#F2EDE0] dark:bg-slate-800 text-[#1E242B] dark:text-amber-300 px-1 py-0.5 rounded">RECESS-7X9P</code> and text it to your friend.
                 </p>
               </div>
 
               {/* Step 3 */}
               <div className="space-y-2">
-                <div className="w-9 h-9 rounded-full bg-[#991B1B] text-white flex items-center justify-center font-bold text-base border-2 border-[#7F1D1D]">
+                <div className="w-9 h-9 rounded-full bg-[#991B1B] dark:bg-red-900 text-white flex items-center justify-center font-bold text-base border-2 border-[#7F1D1D] dark:border-red-700">
                   3
                 </div>
-                <h4 className="font-bold text-base text-[#1E242B]">Settle The Score</h4>
-                <p className="text-xs text-[#475569] leading-relaxed">
+                <h4 className="font-bold text-base text-[#1E242B] dark:text-slate-100">Settle The Score</h4>
+                <p className="text-xs text-[#475569] dark:text-slate-300 leading-relaxed">
                   Play in real-time with sub-20ms WebSocket response and climb the classroom honor roll.
                 </p>
               </div>

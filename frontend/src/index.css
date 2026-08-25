@@ -228,75 +228,111 @@
    Midnight Dark Mode Utility Overrides
    ========================================================================== */
 
-html.dark header {
+/* ==========================================================================
+   Midnight Dark Mode Utility Overrides (Tuned for Human Eye Comfort)
+   ========================================================================== */
+
+html.dark header,
+.dark header {
   background-color: #101726;
   border-color: #1E293B;
 }
 
-html.dark footer {
-  background-color: #0E1422;
+html.dark footer,
+.dark footer {
+  background-color: #0B0F19;
   border-color: #1E293B;
   color: #94A3B8;
 }
 
-html.dark .bg-white {
+/* Backgrounds */
+.dark .bg-white,
+.dark [class*="bg-white"],
+.dark [class*="bg-[#FFFFFF]"],
+.dark [class*="bg-[#ffffff]"] {
   background-color: #141C2E;
 }
 
-html.dark .bg-\[\#FBF9F3\] {
+.dark [class*="bg-[#FBF9F3]"],
+.dark [class*="bg-[#fbf9f3]"] {
   background-color: #0B0F19;
 }
 
-html.dark .bg-\[\#F2EDE0\] {
-  background-color: #101726;
+.dark [class*="bg-[#F8FAFC]"],
+.dark [class*="bg-[#f8fafc]"],
+.dark [class*="bg-[#F2EDE0]"],
+.dark [class*="bg-[#f2ede0]"] {
+  background-color: #1E293B;
 }
 
-html.dark .bg-\[\#FFFFFF\] {
-  background-color: #141C2E;
+/* Eye-Friendly Contrast Typography */
+.dark [class*="text-[#1E242B]"],
+.dark [class*="text-[#1e242b]"] {
+  color: #F1F5F9;
 }
 
-html.dark .border-\[\#1E242B\] {
-  border-color: #334155;
+.dark [class*="text-[#1A365D]"],
+.dark [class*="text-[#1a365d]"] {
+  color: #93C5FD;
 }
 
-html.dark .border-\[\#CBD5E1\] {
-  border-color: #27354A;
+.dark [class*="text-[#475569]"],
+.dark [class*="text-[#475569]"] {
+  color: #CBD5E1;
 }
 
-html.dark .text-\[\#1E242B\] {
-  color: #F8FAFC;
-}
-
-html.dark .text-\[\#475569\] {
+.dark [class*="text-[#94A3B8]"],
+.dark [class*="text-[#94a3b8]"] {
   color: #94A3B8;
 }
 
-html.dark .text-\[\#1A365D\] {
-  color: #60A5FA;
-}
-
-html.dark .text-\[\#15803D\] {
+.dark [class*="text-[#15803D]"],
+.dark [class*="text-[#15803d]"] {
   color: #4ADE80;
 }
 
-html.dark .text-\[\#B45309\] {
-  color: #FBBF24;
+.dark [class*="text-[#B45309]"],
+.dark [class*="text-[#b45309]"] {
+  color: #FDE047;
 }
 
-html.dark .text-\[\#991B1B\] {
-  color: #F87171;
+.dark [class*="text-[#991B1B]"],
+.dark [class*="text-[#991b1b]"] {
+  color: #FCA5A5;
 }
 
-html.dark .shadow-\[3px_3px_0px_0px_\#1E242B\],
-html.dark .shadow-\[2px_2px_0px_0px_\#1E242B\],
-html.dark .shadow-\[4px_4px_0px_0px_\#1E242B\] {
-  box-shadow: 2px 2px 0px 0px #020617;
+/* Borders */
+.dark [class*="border-[#1E242B]"],
+.dark [class*="border-[#1e242b]"],
+.dark [class*="border-[#CBD5E1]"],
+.dark [class*="border-[#cbd5e1]"],
+.dark [class*="border-[#E2E8F0]"],
+.dark [class*="border-[#e2e8f0]"],
+.dark [class*="border-yellow-300"],
+.dark [class*="border-yellow-400"] {
+  border-color: #334155;
 }
 
+/* Tactile Dark Shadows */
+.dark [class*="shadow-"][class*="#1E242B"],
+.dark [class*="shadow-"][class*="#475569"],
+.dark [class*="shadow-"][class*="#CBD5E1"] {
+  box-shadow: 3px 3px 0px 0px #020617;
+}
+
+/* Inputs & Form Elements */
 html.dark input, 
 html.dark select, 
-html.dark textarea {
-  background-color: #0B0F19;
+html.dark textarea,
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #101726;
   color: #F8FAFC;
   border-color: #334155;
+}
+
+html.dark input::placeholder,
+.dark input::placeholder {
+  color: #64748B;
 }

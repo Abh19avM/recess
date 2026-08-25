@@ -250,20 +250,20 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
           /* Step 2: Live Queue Searching Screen */
           <div className="py-8 flex flex-col items-center justify-center text-center space-y-5">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full border-4 border-[#1A365D] border-t-transparent animate-spin flex items-center justify-center" />
+              <div className="w-20 h-20 rounded-full border-4 border-[#1A365D] dark:border-sky-500 border-t-transparent animate-spin flex items-center justify-center" />
               <div className="absolute inset-0 flex items-center justify-center text-2xl">
                 {gameIcon}
               </div>
             </div>
 
             <div>
-              <h3 className="text-xl font-bold text-[#1E242B]">Searching the Classroom...</h3>
-              <p className="font-hand text-base text-[#475569] mt-0.5">
+              <h3 className="text-xl font-bold text-[#1E242B] dark:text-slate-100">Searching the Classroom...</h3>
+              <p className="font-hand text-base text-[#475569] dark:text-slate-300 mt-0.5">
                 Looking for a classmate ready to play {gameTitle}.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#CBD5E1] font-mono text-xs font-bold text-[#1A365D]">
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-slate-900 border border-[#CBD5E1] dark:border-slate-700 font-mono text-xs font-bold text-[#1A365D] dark:text-sky-300 shadow-xs">
               <Clock className="w-3.5 h-3.5" />
               <span>Time in Queue: {Math.floor(searchSeconds / 60)}:{searchSeconds % 60 < 10 ? '0' : ''}{searchSeconds % 60}</span>
             </div>
@@ -285,21 +285,21 @@ export const MatchmakingModal: React.FC<MatchmakingModalProps> = ({
             <div className="flex items-center justify-center gap-6 my-2">
               <div className="text-center">
                 <Avatar username={matchedGame?.player1.username || 'P1'} size="md" />
-                <p className="font-bold text-xs text-[#1E242B] mt-1">@{matchedGame?.player1.username}</p>
+                <p className="font-bold text-xs text-[#1E242B] dark:text-slate-100 mt-1">@{matchedGame?.player1.username}</p>
                 <Badge variant="pencil" size="sm">Rating: {matchedGame?.player1.rating || 1000}</Badge>
               </div>
 
-              <div className="font-hand text-2xl font-bold text-[#991B1B]">VS</div>
+              <div className="font-hand text-2xl font-bold text-[#991B1B] dark:text-red-400">VS</div>
 
               <div className="text-center">
                 <Avatar username={matchedGame?.player2.username || 'P2'} size="md" />
-                <p className="font-bold text-xs text-[#1E242B] mt-1">@{matchedGame?.player2.username}</p>
+                <p className="font-bold text-xs text-[#1E242B] dark:text-slate-100 mt-1">@{matchedGame?.player2.username}</p>
                 <Badge variant="pencil" size="sm">Rating: {matchedGame?.player2.rating || 1000}</Badge>
               </div>
             </div>
 
-            <div className="p-3 rounded-lg bg-[#DCFCE7] border border-[#86EFAC] w-full">
-              <p className="font-hand text-lg font-bold text-[#15803D]">
+            <div className="p-3 rounded-lg bg-[#DCFCE7] dark:bg-emerald-950/60 border border-[#86EFAC] dark:border-emerald-700/60 w-full">
+              <p className="font-hand text-lg font-bold text-[#15803D] dark:text-emerald-300">
                 Match starting in {countdown} second{countdown === 1 ? '' : 's'}...
               </p>
             </div>
