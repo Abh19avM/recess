@@ -66,7 +66,7 @@ export function useWebSocket(options: UseWebSocketOptions = {}) {
     const protocol = isSecure ? 'wss:' : 'ws:'
     const isDev = window.location.port === '5173'
     const targetHost = isDev ? `${window.location.hostname}:8080` : window.location.host
-    let wsUrl = `${protocol}//${targetHost}/ws`
+    let wsUrl = import.meta.env.VITE_WS_URL || `${protocol}//${targetHost}/ws`
 
     // Add query params
     const params = new URLSearchParams()
