@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/Abh19avM/recess/internal/metrics"
@@ -38,7 +39,7 @@ func Load() *Config {
 		WriteTimeout:    getEnvDuration("WRITE_TIMEOUT", 15*time.Second),
 		IdleTimeout:     getEnvDuration("IDLE_TIMEOUT", 60*time.Second),
 		ShutdownTimeout: getEnvDuration("SHUTDOWN_TIMEOUT", 10*time.Second),
-		CORSAllowed:     []string{"http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"},
+		CORSAllowed:     getEnvSlice("CORS_ALLOWED_ORIGINS", []string{"http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:5173"}),
 	}
 }
 
@@ -92,6 +93,13 @@ func getEnvDuration(key string, fallback time.Duration) time.Duration {
 			return time.Duration(sec) * time.Second
 		}
 		slog.Warn(fmt.Sprintf("Invalid duration for %s=%q, using fallback %v", key, val, fallback))
+	}
+	return fallback
+}
+
+func getEnvSlice(key string, fallback []string) []string {
+	if val, ok := os.LookupEnv(key); ok && val != "" {
+		return strings.Split(val, ",")
 	}
 	return fallback
 }
